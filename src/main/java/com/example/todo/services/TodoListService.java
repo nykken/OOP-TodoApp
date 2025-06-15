@@ -58,12 +58,6 @@ public class TodoListService {
         return todoListRepository.existsById(id);
     }
 
-    public static class TodoListNotFoundException extends RuntimeException {
-        public TodoListNotFoundException(String message) {
-            super(message);
-        }
-    }
-
     public Optional<TodoList> getTodoListEntity(Long id) {
         return todoListRepository.findById(id);
     }
