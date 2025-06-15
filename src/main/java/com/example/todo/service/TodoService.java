@@ -2,7 +2,7 @@ package com.example.todo.service;
 
 import com.example.todo.dto.TodoRequest;
 import com.example.todo.dto.TodoResponse;
-import com.example.todo.entity.Todo;
+import com.example.todo.entities.Todo;
 import com.example.todo.repository.TodoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,7 +57,6 @@ public class TodoService {
 
         if (existingTodo.isPresent()) {
             Todo todo = existingTodo.get();
-            todo.setTitle(request.getTitle());
             todo.setDescription(request.getDescription());
 
             Todo updatedTodo = todoRepository.save(todo);
@@ -84,9 +83,8 @@ public class TodoService {
                 .collect(Collectors.toList());
     }
 
-    // Search by title
     public List<TodoResponse> searchTodos(String keyword) {
-        List<Todo> todos = todoRepository.findByTitleContainingIgnoreCase(keyword);
+        List<Todo> todos = todoRepository.findByDescriptionContainingIgnoreCase(keyword);
         return todos.stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
@@ -96,7 +94,6 @@ public class TodoService {
     private TodoResponse convertToResponse(Todo todo) {
         TodoResponse response = new TodoResponse();
         response.setId(todo.getId());
-        response.setTitle(todo.getTitle());
         response.setDescription(todo.getDescription());
         response.setCompleted(todo.getCompleted());
         response.setCreatedAt(todo.getCreatedAt());
@@ -107,7 +104,6 @@ public class TodoService {
     // Convert Request DTO to Entity
     private Todo convertToEntity(TodoRequest request) {
         Todo todo = new Todo();
-        todo.setTitle(request.getTitle());
         todo.setDescription(request.getDescription());
         todo.setCompleted(false);
         return todo;
