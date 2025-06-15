@@ -3,39 +3,32 @@ package com.example.todo.entities;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import java.time.LocalDateTime;
+
+import java.util.List;
 
 @Entity
 @Table(name = "todos")
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class Todo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String description;
 
     @Column(nullable = false)
     private Boolean completed = false;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "todo_list_id", nullable = false)
+    private TodoList todoList;
 
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
+    public Todo(String description, TodoList todoList) {
+        this.description = description;
+        this.completed = false;
+        this.todoList = todoList;
     }
 }

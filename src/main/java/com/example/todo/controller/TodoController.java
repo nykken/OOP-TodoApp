@@ -1,8 +1,11 @@
 package com.example.todo.controller;
 
+import com.example.todo.dto.TodoListRequest;
+import com.example.todo.dto.TodoListResponse;
 import com.example.todo.dto.TodoRequest;
 import com.example.todo.dto.TodoResponse;
-import com.example.todo.service.TodoService;
+import com.example.todo.services.TodoService;
+import com.example.todo.services.TodoListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,12 +16,15 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/todos")
+@RequestMapping("/lists")
 @CrossOrigin(origins = "*")
 public class TodoController {
 
     @Autowired
     private TodoService todoService;
+
+    @Autowired
+    private TodoListService todoListService;
 
     @GetMapping
     public ResponseEntity<List<TodoResponse>> getAllTodos(
@@ -36,12 +42,22 @@ public class TodoController {
         return ResponseEntity.ok(todos);
     }
 
-    // GET /todos/1 - Get todo by ID
-    @GetMapping("/{id}")
-    public ResponseEntity<TodoResponse> getTodoById(@PathVariable Long id) {
-        Optional<TodoResponse> todo = todoService.getTodoById(id);
+    @GetMapping
+    public ResponseEntity<List<TodoListResponse>> getAllTodoLists() {
+        List<TodoListResponse> todoLists = todoListService.getAllTodoLists();
 
-        return todo.map(ResponseEntity::ok)
+        return ResponseEntity.ok(todoLists);
+    }
+
+
+
+
+    // GET /lists/1 - Get todo list by id
+    @GetMapping("/{id}")
+    public ResponseEntity<TodoListResponse> getTodoById(@PathVariable Long id) {
+        Optional<TodoListResponse> todoList = todoListService.getTodoListById(id);
+
+        return todoList.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 

@@ -1,9 +1,10 @@
-package com.example.todo.service;
+package com.example.todo.services;
 
 import com.example.todo.dto.TodoRequest;
 import com.example.todo.dto.TodoResponse;
 import com.example.todo.entities.Todo;
-import com.example.todo.repository.TodoRepository;
+import com.example.todo.entities.TodoList;
+import com.example.todo.repositories.TodoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,24 +18,26 @@ public class TodoService {
     @Autowired
     private TodoRepository todoRepository;
 
+    @Autowired
+    private TodoListService todoListService;
+
     public List<TodoResponse> getAllTodos() {
         List<Todo> todos = todoRepository.findAll();
         return todos.stream()
-                .map(this::convertToResponse)
+                .map(ConversionUtils::convertEntryToResponse)
                 .collect(Collectors.toList());
     }
 
-    // Get todo by id
     public Optional<TodoResponse> getTodoById(Long id) {
-        Optional<Todo> todo = todoRepository.findById(id);
-        return todo.map(this::convertToResponse);
+        return todoRepository.findById(id)
+                .map(ConversionUtils::convertEntryToResponse);
     }
 
     // Create new
     public TodoResponse createTodo(TodoRequest request) {
         Todo todo = convertToEntity(request);
         Todo savedTodo = todoRepository.save(todo);
-        return convertToResponse(savedTodo);
+        return ConversionUtils.convertEntryToResponse(savedTodo);
     }
 
     public Optional<TodoResponse> completeTodo(Long id) {
@@ -45,7 +48,7 @@ public class TodoService {
             todo.setCompleted(true);
 
             Todo updatedTodo = todoRepository.save(todo);
-            return Optional.of(convertToResponse(updatedTodo));
+            return Optional.of(ConversionUtils.convertEntryToResponse(updatedTodo));
         }
 
         return Optional.empty();
@@ -60,7 +63,7 @@ public class TodoService {
             todo.setDescription(request.getDescription());
 
             Todo updatedTodo = todoRepository.save(todo);
-            return Optional.of(convertToResponse(updatedTodo));
+            return Optional.of(ConversionUtils.convertEntryToResponse(updatedTodo));
         }
 
         return Optional.empty();
@@ -79,33 +82,25 @@ public class TodoService {
     public List<TodoResponse> getTodosByStatus(Boolean completed) {
         List<Todo> todos = todoRepository.findByCompleted(completed);
         return todos.stream()
-                .map(this::convertToResponse)
+                .map(ConversionUtils::convertEntryToResponse)
                 .collect(Collectors.toList());
     }
 
     public List<TodoResponse> searchTodos(String keyword) {
         List<Todo> todos = todoRepository.findByDescriptionContainingIgnoreCase(keyword);
         return todos.stream()
-                .map(this::convertToResponse)
+                .map(ConversionUtils::convertEntryToResponse)
                 .collect(Collectors.toList());
     }
 
-    // Convert Entity to Response DTO
-    private TodoResponse convertToResponse(Todo todo) {
-        TodoResponse response = new TodoResponse();
-        response.setId(todo.getId());
-        response.setDescription(todo.getDescription());
-        response.setCompleted(todo.getCompleted());
-        response.setCreatedAt(todo.getCreatedAt());
-        response.setUpdatedAt(todo.getUpdatedAt());
-        return response;
-    }
-
-    // Convert Request DTO to Entity
     private Todo convertToEntity(TodoRequest request) {
+        TodoList todoList = todoListService.getTodoListEntityById(request.getTodoListId());
+
         Todo todo = new Todo();
         todo.setDescription(request.getDescription());
         todo.setCompleted(false);
+        todo.setTodoList(todoList);
         return todo;
     }
+
 }
