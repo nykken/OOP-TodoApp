@@ -27,9 +27,11 @@ public class TodoService {
             return Collections.emptyList(); // or throw exception if you prefer
         }
 
+        // Sort the todos - pending first
         List<Todo> todos = todoRepository.findByTodoListId(listId);
         return todos.stream()
                 .map(ConversionUtils::convertTodoToResponse)
+                .sorted((t1, t2) -> Boolean.compare(t1.getCompleted(), t2.getCompleted()))
                 .collect(Collectors.toList());
     }
 
