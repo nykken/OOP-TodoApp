@@ -15,17 +15,17 @@ public class ConversionUtils {
         response.setId(todoList.getId());
         response.setName(todoList.getName());
 
-        List<TodoResponse> entries = todoList.getTodos()
+        List<TodoResponse> todos = todoList.getTodos()
                 .stream()
-                .map(ConversionUtils::convertEntryToResponse)
+                .map(ConversionUtils::convertTodoToResponse)
                 .toList();
 
-        response.setEntries(entries);
+        response.setTodos(todos);
 
         return response;
     }
 
-    static TodoResponse convertEntryToResponse(Todo todo) {
+    static TodoResponse convertTodoToResponse(Todo todo) {
         TodoResponse response = new TodoResponse();
         response.setId(todo.getId());
         response.setDescription(todo.getDescription());

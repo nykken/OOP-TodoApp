@@ -8,5 +8,5 @@ import java.util.List;
 public class TodoListResponse {
     private Long id;
     private String name;
-    private List<TodoResponse> entries;
+    private List<TodoResponse> todos;
 }

@@ -3,11 +3,11 @@ package com.example.todo.services;
 import com.example.todo.dto.TodoRequest;
 import com.example.todo.dto.TodoResponse;
 import com.example.todo.entities.Todo;
-import com.example.todo.entities.TodoList;
 import com.example.todo.repositories.TodoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -21,86 +21,82 @@ public class TodoService {
     @Autowired
     private TodoListService todoListService;
 
-    public List<TodoResponse> getAllTodos() {
-        List<Todo> todos = todoRepository.findAll();
+    // Get all todos in a list
+    public List<TodoResponse> getTodos(Long listId) {
+        if (!todoListService.exists(listId)) {
+            return Collections.emptyList(); // or throw exception if you prefer
+        }
+
+        List<Todo> todos = todoRepository.findByTodoListId(listId);
         return todos.stream()
-                .map(ConversionUtils::convertEntryToResponse)
+                .map(ConversionUtils::convertTodoToResponse)
                 .collect(Collectors.toList());
     }
 
-    public Optional<TodoResponse> getTodoById(Long id) {
-        return todoRepository.findById(id)
-                .map(ConversionUtils::convertEntryToResponse);
-    }
-
-    // Create new
-    public TodoResponse createTodo(TodoRequest request) {
-        Todo todo = convertToEntity(request);
-        Todo savedTodo = todoRepository.save(todo);
-        return ConversionUtils.convertEntryToResponse(savedTodo);
-    }
-
-    public Optional<TodoResponse> completeTodo(Long id) {
-        Optional<Todo> existingTodo = todoRepository.findById(id);
-
-        if (existingTodo.isPresent()) {
-            Todo todo = existingTodo.get();
-            todo.setCompleted(true);
-
-            Todo updatedTodo = todoRepository.save(todo);
-            return Optional.of(ConversionUtils.convertEntryToResponse(updatedTodo));
+    // Get todos in a list, filtered by completion status
+    public List<TodoResponse> getTodos(Long listId, Boolean completed) {
+        if (!todoListService.exists(listId)) {
+            return Collections.emptyList();
         }
 
-        return Optional.empty();
+        List<Todo> todos = todoRepository.findByTodoListIdAndCompleted(listId, completed);
+        return todos.stream()
+                .map(ConversionUtils::convertTodoToResponse)
+                .collect(Collectors.toList());
     }
 
-    // Update existing
-    public Optional<TodoResponse> updateTodo(Long id, TodoRequest request) {
-        Optional<Todo> existingTodo = todoRepository.findById(id);
-
-        if (existingTodo.isPresent()) {
-            Todo todo = existingTodo.get();
-            todo.setDescription(request.getDescription());
-
-            Todo updatedTodo = todoRepository.save(todo);
-            return Optional.of(ConversionUtils.convertEntryToResponse(updatedTodo));
+    public Optional<TodoResponse> getTodo(Long listId, Long todoId) {
+        if (!todoListService.exists(listId)) {
+            return Optional.empty();
         }
 
-        return Optional.empty();
+        return todoRepository.findByIdAndTodoListId(todoId, listId)
+                .map(ConversionUtils::convertTodoToResponse);
     }
 
-    // Delete
-    public boolean deleteTodo(Long id) {
-        if (todoRepository.existsById(id)) {
-            todoRepository.deleteById(id);
+    public Optional<TodoResponse> createTodo(Long listId, TodoRequest request) {
+        return todoListService.getTodoListEntity(listId)
+                .map(todoList -> {
+                    Todo todo = new Todo(request.getDescription(), todoList);
+                    Todo savedTodo = todoRepository.save(todo);
+                    return ConversionUtils.convertTodoToResponse(savedTodo);
+                });
+
+    }
+
+    public Optional<TodoResponse> updateTodo(Long listId, Long todoId, TodoRequest request) {
+        return todoRepository.findByIdAndTodoListId(todoId, listId)
+                .map(todo -> {
+                    todo.setDescription(request.getDescription());
+                    Todo updatedTodo = todoRepository.save(todo);
+                    return ConversionUtils.convertTodoToResponse(updatedTodo);
+                });
+    }
+
+    public boolean deleteTodo(Long listId, Long todoId) {
+        Optional<Todo> todo = todoRepository.findByIdAndTodoListId(todoId, listId);
+        if (todo.isPresent()) {
+            todoRepository.deleteById(todoId);
             return true;
         }
         return false;
     }
 
-    // Get todos by completion status
-    public List<TodoResponse> getTodosByStatus(Boolean completed) {
-        List<Todo> todos = todoRepository.findByCompleted(completed);
-        return todos.stream()
-                .map(ConversionUtils::convertEntryToResponse)
-                .collect(Collectors.toList());
+    public Optional<TodoResponse> markTodoAsComplete(Long listId, Long todoId) {
+        return setTodoCompletionStatus(listId, todoId, true);
     }
 
-    public List<TodoResponse> searchTodos(String keyword) {
-        List<Todo> todos = todoRepository.findByDescriptionContainingIgnoreCase(keyword);
-        return todos.stream()
-                .map(ConversionUtils::convertEntryToResponse)
-                .collect(Collectors.toList());
+    public Optional<TodoResponse> markTodoAsIncomplete(Long listId, Long todoId) {
+        return setTodoCompletionStatus(listId, todoId, false);
     }
 
-    private Todo convertToEntity(TodoRequest request) {
-        TodoList todoList = todoListService.getTodoListEntityById(request.getTodoListId());
-
-        Todo todo = new Todo();
-        todo.setDescription(request.getDescription());
-        todo.setCompleted(false);
-        todo.setTodoList(todoList);
-        return todo;
+    // Helper method to change completion status
+    private Optional<TodoResponse> setTodoCompletionStatus(Long listId, Long todoId, boolean completed) {
+        return todoRepository.findByIdAndTodoListId(todoId, listId)
+                .map(todo -> {
+                    todo.setCompleted(completed);
+                    Todo updatedTodo = todoRepository.save(todo);
+                    return ConversionUtils.convertTodoToResponse(updatedTodo);
+                });
     }
-
 }

@@ -19,7 +19,7 @@ public class TodoList {
 
     private String name;
 
-    @OneToMany(mappedBy = "todoList", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "todoList", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Todo> todos = new ArrayList<>();
 
     public TodoList(String name) {
