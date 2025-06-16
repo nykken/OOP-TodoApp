@@ -5,7 +5,6 @@ import com.example.todo.dto.TodoListResponse;
 import com.example.todo.dto.TodoRequest;
 import com.example.todo.dto.TodoResponse;
 import com.example.todo.services.TodoService;
-import com.example.todo.services.TodoListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,27 +22,25 @@ public class TodoListController {
     @Autowired
     private TodoService todoService;
 
-    @Autowired
-    private TodoListService todoListService;
 
     // ---- LIST OPERATIONS ----
 
     @GetMapping
     public ResponseEntity<List<TodoListResponse>> getAllTodoLists() {
-        List<TodoListResponse> todoLists = todoListService.getAllTodoLists();
+        List<TodoListResponse> todoLists = todoService.getAllTodoLists();
         return ResponseEntity.ok(todoLists);
     }
 
     @GetMapping("/{listId}")
     public ResponseEntity<TodoListResponse> getTodoListById(@PathVariable Long listId) {
-        Optional<TodoListResponse> todoList = todoListService.getTodoList(listId);
+        Optional<TodoListResponse> todoList = todoService.getTodoList(listId);
         return todoList.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
     public ResponseEntity<TodoListResponse> createTodoList(@Valid @RequestBody TodoListRequest request) {
-        TodoListResponse createdTodoList = todoListService.createTodoList(request);
+        TodoListResponse createdTodoList = todoService.createTodoList(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTodoList);
     }
 
@@ -52,7 +49,7 @@ public class TodoListController {
     public ResponseEntity<TodoListResponse> updateTodoList(
             @PathVariable Long listId,
             @Valid @RequestBody TodoListRequest request) {
-        Optional<TodoListResponse> updatedTodoList = todoListService.updateTodoList(listId, request);
+        Optional<TodoListResponse> updatedTodoList = todoService.updateTodoList(listId, request);
         return updatedTodoList.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -60,7 +57,7 @@ public class TodoListController {
 
     @DeleteMapping("/{listId}")
     public ResponseEntity<Void> deleteTodoList(@PathVariable Long listId) {
-        boolean deleted = todoListService.deleteTodoList(listId);
+        boolean deleted = todoService.deleteTodoList(listId);
         if (deleted) {
             return ResponseEntity.noContent().build();
         } else {
