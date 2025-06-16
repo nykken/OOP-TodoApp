@@ -2,6 +2,7 @@ package com.example.todo.services;
 
 import com.example.todo.dto.TodoListRequest;
 import com.example.todo.dto.TodoListResponse;
+import com.example.todo.dto.TodoResponse;
 import com.example.todo.entities.TodoList;
 import com.example.todo.repositories.TodoListRepository;
 import jakarta.transaction.Transactional;
@@ -16,6 +17,10 @@ public class TodoListService {
 
     @Autowired
     private TodoListRepository todoListRepository;
+
+    @Autowired
+    private TodoService todoService;
+
 
     public Optional<TodoListResponse> getTodoList(Long id) {
         return todoListRepository.findById(id)
@@ -55,6 +60,16 @@ public class TodoListService {
     // Check if TodoList exists
     public boolean exists(Long id) {
         return todoListRepository.existsById(id);
+    }
+
+    public int getTotalTodoCount(Long listId) {
+        return todoService.getTodos(listId).size();
+    }
+
+    public int getCompletedTodoCount(Long listId) {
+        return (int) todoService.getTodos(listId).stream()
+                .filter(TodoResponse::isCompleted)
+                .count();
     }
 
     public Optional<TodoList> getTodoListEntity(Long id) {

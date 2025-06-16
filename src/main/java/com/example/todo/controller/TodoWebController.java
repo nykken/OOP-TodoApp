@@ -14,7 +14,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -28,12 +31,21 @@ public class TodoWebController {
     @Autowired
     private TodoService todoService;
 
-
     // Home page - show all todo lists
     @GetMapping
     public String home(Model model) {
         List<TodoListResponse> todoLists = todoListService.getAllTodoLists();
+
+        Map<Long, String> todoCountsMap = new HashMap<>();
+
+        for (TodoListResponse todoList : todoLists) {
+            int total = todoListService.getTotalTodoCount(todoList.getId());
+            int completed = todoListService.getCompletedTodoCount(todoList.getId());
+            todoCountsMap.put(todoList.getId(), completed + "/" + total);
+        }
+
         model.addAttribute("todoLists", todoLists);
+        model.addAttribute("todoCountsMap", todoCountsMap);
         model.addAttribute("newTodoList", new TodoListRequest());
         return "index";
     }

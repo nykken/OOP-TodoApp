@@ -2,8 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:insert="~{layout :: head}"></head>
 <body>
-  <!-- Navigation -->
-  <nav th:insert="~{layout :: nav}"></nav>
+<!-- Navigation -->
+<nav th:insert="~{layout :: nav}"></nav>
 
 <!-- Main Content -->
 <div class="container">
@@ -90,56 +90,56 @@
   </div>
 </div>
 
-  <!-- Edit Todo Modal -->
-  <div class="modal" id="editTodoListModal">
-    <div class="modal-dialog">
-      <form id="editTodoListForm" method="post">
-        <div class="modal-header">
-          <h5 class="modal-title">Rename</h5>
-          <button type="button" class="btn-close" onclick="closeModal('editTodoListModal')">&times;</button>
+<!-- Edit Todo Modal -->
+<div class="modal" id="editTodoListModal">
+  <div class="modal-dialog">
+    <form id="editTodoListForm" method="post">
+      <div class="modal-header">
+        <h5 class="modal-title">Rename</h5>
+        <button type="button" class="btn-close" onclick="closeModal('editTodoListModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="editTodoListName" class="form-label">Name</label>
+          <input type="text"
+                 class="form-control"
+                 id="editTodoListName"
+                 name="name"
+                 placeholder="Enter todo list name"
+                 required>
         </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="editTodoListName" class="form-label">Name</label>
-            <input type="text"
-                   class="form-control"
-                   id="editTodoListName"
-                   name="name"
-                   placeholder="Enter todo list name"
-                   required>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" onclick="closeModal('editTodoListModal')">Cancel</button>
-          <button type="submit" class="btn btn-primary">
-            <i class="fas fa-save"></i>
-            Save Changes
-          </button>
-        </div>
-      </form>
-    </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('editTodoListModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save"></i>
+          Save Changes
+        </button>
+      </div>
+    </form>
   </div>
+</div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      document.querySelectorAll('.edit-todo-btn').forEach(button => {
-          button.addEventListener('click', function() {
-              // Read the data from the clicked button
-              const listId = this.getAttribute('data-list-id');
-              const name = this.getAttribute('data-name');
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.edit-todo-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            // Read the data from the clicked button
+            const listId = this.getAttribute('data-list-id');
+            const name = this.getAttribute('data-name');
 
-              // Set up the modal form
-              const form = document.getElementById('editTodoListForm');
-              const input = document.getElementById('editTodoListName');
+            // Set up the modal form
+            const form = document.getElementById('editTodoListForm');
+            const input = document.getElementById('editTodoListName');
 
-              form.action = `/lists/${listId}/update`;
-              input.value = name;
+            form.action = `/lists/${listId}/update`;
+            input.value = name;
 
-              openModal('editTodoListModal');
-          });
-      });
-  });
-  </script>
+            openModal('editTodoListModal');
+        });
+    });
+});
+</script>
 
 
 </body>

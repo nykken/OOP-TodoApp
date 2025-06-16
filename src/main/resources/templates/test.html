@@ -1,6 +1,168 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:insert="~{layout :: head}"></head>
+<head th:insert="~{layout :: head}">
+    <style>
+        /* Mobile-first responsive design */
+        .todo-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .todo-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+        }
+
+        .todo-modal .modal-dialog {
+            max-width: 90vw;
+            width: 500px;
+        }
+
+        .list-title-container {
+            margin-bottom: 24px;
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 16px;
+        }
+
+        .list-title-input {
+            font-size: 1.5rem;
+            font-weight: bold;
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 100%;
+            padding: 8px 0;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .list-title-input:focus {
+            border-bottom-color: #007bff;
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f8f9fa;
+            transition: background-color 0.2s;
+        }
+
+        .todo-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .todo-item:last-child {
+            border-bottom: none;
+        }
+
+        .todo-item.completed {
+            opacity: 0.7;
+        }
+
+        .todo-checkbox {
+            margin-right: 12px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .todo-text {
+            flex: 1;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+            border: 1px solid transparent;
+            outline: none;
+        }
+
+        .todo-text:hover {
+            background-color: #fff;
+        }
+
+        .todo-text.completed {
+            text-decoration: line-through;
+            color: #6c757d;
+        }
+
+        .todo-text.editing {
+            background-color: #fff;
+            border: 1px solid #007bff;
+        }
+
+        .add-todo-container {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .add-todo-input {
+            width: 100%;
+            border: none;
+            outline: none;
+            padding: 12px 0;
+            font-size: 1rem;
+            background: transparent;
+            border-bottom: 1px solid #dee2e6;
+            transition: border-color 0.2s;
+        }
+
+        .add-todo-input:focus {
+            border-bottom-color: #007bff;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 16px 24px 0 24px;
+            border-bottom: none;
+        }
+
+        .modal-header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .progress-indicator {
+            font-size: 0.875rem;
+            color: #6c757d;
+            background: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .todo-modal .modal-dialog {
+                margin: 10px;
+                max-width: calc(100vw - 20px);
+            }
+
+            .modal-body {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
 <body>
 <!-- Navigation -->
 <nav th:insert="~{layout :: nav}"></nav>
@@ -27,33 +189,34 @@
             <p>Create your first todo list to get started!</p>
         </div>
 
-
         <!-- Todo Lists Cards -->
         <div class="cards-container" th:if="${todoLists != null and not #lists.isEmpty(todoLists)}">
-            <div class="card" th:each="todoList : ${todoLists}" th:if="${todoList != null}">
+            <div class="card todo-card"
+                 th:each="todoList : ${todoLists}"
+                 th:if="${todoList != null}"
+                 th:onclick="'openTodoListModal(' + ${todoList.id} + ', \'' + ${todoList.name} + '\')'">
                 <div class="card-body">
                     <div class="card-header">
                         <h5 class="card-title" th:text="${todoList.name}"></h5>
-                        <button class="btn btn-sm btn-outline-primary edit-todo-btn"
-                                th:attr="data-list-id=${todoList.id}, data-description=${todoList.name}">
+                        <button class="btn btn-sm btn-outline-primary edit-list-name-btn"
+                                th:attr="data-list-id=${todoList.id}, data-list-name=${todoList.name}"
+                                onclick="event.stopPropagation();">
                             <i class="fas fa-edit"></i>
                         </button>
                     </div>
-                    <div class="badge">0/0</div>
-                    <p class="text-muted">Click to view todos</p>
-                </div>
-                <div class="card-footer">
-                    <button type="button" class="btn btn-outline-primary btn-sm" th:onclick="'window.location.href = \'/lists/\' + ' + ${todoList.id}">
-                        <i class="fas fa-eye"></i>
-                        View
-                    </button>
-                    <form th:if="${todoList.id != null}" th:action="@{/lists/{id}/delete(id=${todoList.id})}" method="post" style="display: inline;">
-                        <button type="submit" class="btn btn-outline-danger btn-sm"
-                                onclick="return confirmDelete('Are you sure you want to delete this todo list?')">
-                            <i class="fas fa-trash"></i>
-                            Delete
-                        </button>
-                    </form>
+                    <div class="card-footer">
+                        <div class="badge" id="progress-${todoList.id}">0/0</div>
+                        <form th:if="${todoList.id != null}"
+                              th:action="@{/lists/{id}/delete(id=${todoList.id})}"
+                              method="post"
+                              style="display: inline;"
+                              onclick="event.stopPropagation();">
+                            <button type="submit" class="btn btn-outline-danger btn-sm"
+                                    onclick="return confirmDelete('Are you sure you want to delete this todo list?')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -90,57 +253,311 @@
     </div>
 </div>
 
-<!-- Edit Todo Modal -->
-<div class="modal" id="editTodoListModal">
+<!-- Todo List Modal -->
+<div class="modal todo-modal" id="todoListModal">
     <div class="modal-dialog">
-        <form id="editTodoListForm" method="post">
+        <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Rename</h5>
-                <button type="button" class="btn-close" onclick="closeModal('editTodoListModal')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="editTodoListName" class="form-label">Name</label>
-                    <input type="text"
-                           class="form-control"
-                           id="editTodoListName"
-                           name="name"
-                           placeholder="Enter todo list name"
-                           required>
+                <div class="modal-header-actions">
+                    <span class="progress-indicator" id="modalProgress">0/0</span>
+                    <button type="button" class="btn-close" onclick="closeModal('todoListModal')">&times;</button>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('editTodoListModal')">Cancel</button>
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i>
-                    Save Changes
-                </button>
+            <div class="modal-body">
+                <!-- List Title -->
+                <div class="list-title-container">
+                    <input type="text"
+                           class="list-title-input"
+                           id="modalListTitle"
+                           value=""
+                           onblur="updateListTitle()"
+                           onkeypress="if(event.key==='Enter') this.blur()">
+                </div>
+
+                <!-- Todo Items -->
+                <div id="todoItemsContainer">
+                    <!-- Todo items will be loaded here -->
+                </div>
+
+                <!-- Add New Todo -->
+                <div class="add-todo-container">
+                    <input type="text"
+                           class="add-todo-input"
+                           id="newTodoInput"
+                           placeholder="Add a new todo..."
+                           onkeypress="if(event.key==='Enter') addNewTodo()">
+                </div>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
 <script>
+    let currentListId = null;
+    let todos = [];
+
+    // Load todos for a specific list
+    async function loadTodos(listId) {
+        try {
+            const response = await fetch(`/api/lists/${listId}/todos`);
+            if (response.ok) {
+                todos = await response.json();
+                renderTodos();
+                updateProgress();
+            }
+        } catch (error) {
+            console.error('Error loading todos:', error);
+            // Fallback: create some sample todos for demo
+            todos = [
+                { id: 1, description: 'Sample todo 1', completed: false },
+                { id: 2, description: 'Sample todo 2', completed: true },
+                { id: 3, description: 'Sample todo 3', completed: false }
+            ];
+            renderTodos();
+            updateProgress();
+        }
+    }
+
+    // Open todo list modal
+    function openTodoListModal(listId, listName) {
+        currentListId = listId;
+        document.getElementById('modalListTitle').value = listName;
+        loadTodos(listId);
+        openModal('todoListModal');
+    }
+
+    // Render todos in the modal (pending todos first, completed at bottom)
+    function renderTodos() {
+        const container = document.getElementById('todoItemsContainer');
+        container.innerHTML = '';
+
+        // Sort todos: pending first, completed last
+        const sortedTodos = [...todos].sort((a, b) => {
+            if (a.completed === b.completed) return 0;
+            return a.completed ? 1 : -1;
+        });
+
+        sortedTodos.forEach(todo => {
+            const todoElement = createTodoElement(todo);
+            container.appendChild(todoElement);
+        });
+    }
+
+    // Create a todo element
+    function createTodoElement(todo) {
+        const div = document.createElement('div');
+        div.className = `todo-item ${todo.completed ? 'completed' : ''}`;
+        div.innerHTML = `
+            <input type="checkbox"
+                   class="todo-checkbox"
+                   ${todo.completed ? 'checked' : ''}
+                   onchange="toggleTodo(${todo.id})">
+            <span class="todo-text ${todo.completed ? 'completed' : ''}"
+                  onclick="editTodo(${todo.id})"
+                  id="todo-text-${todo.id}">${todo.description}</span>
+        `;
+        return div;
+    }
+
+    // Toggle todo completion
+    async function toggleTodo(todoId) {
+        const todo = todos.find(t => t.id === todoId);
+        if (todo) {
+            todo.completed = !todo.completed;
+
+            try {
+                await fetch(`/lists/${currentListId}/todos/${todoId}/toggle`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    }
+                });
+            } catch (error) {
+                console.error('Error toggling todo:', error);
+            }
+
+            renderTodos();
+            updateProgress();
+            updateCardProgress(currentListId);
+        }
+    }
+
+    // Edit todo inline
+    function editTodo(todoId) {
+        const textElement = document.getElementById(`todo-text-${todoId}`);
+        const currentText = textElement.textContent;
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'todo-text editing';
+        input.value = currentText;
+
+        textElement.replaceWith(input);
+        input.focus();
+        input.select();
+
+        const saveEdit = async () => {
+            const newText = input.value.trim();
+            if (newText && newText !== currentText) {
+                const todo = todos.find(t => t.id === todoId);
+                if (todo) {
+                    todo.description = newText;
+
+                    try {
+                        await fetch(`/lists/${currentListId}/todos/${todoId}/update`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: `description=${encodeURIComponent(newText)}`
+                        });
+                    } catch (error) {
+                        console.error('Error updating todo:', error);
+                    }
+                }
+            }
+            renderTodos();
+        };
+
+        input.addEventListener('blur', saveEdit);
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                input.blur();
+            } else if (e.key === 'Escape') {
+                renderTodos(); // Cancel edit
+            }
+        });
+    }
+
+    // Delete todo
+    async function deleteTodo(todoId) {
+        if (confirm('Are you sure you want to delete this todo?')) {
+            todos = todos.filter(t => t.id !== todoId);
+
+            try {
+                await fetch(`/lists/${currentListId}/todos/${todoId}/delete`, {
+                    method: 'POST'
+                });
+            } catch (error) {
+                console.error('Error deleting todo:', error);
+            }
+
+            renderTodos();
+            updateProgress();
+            updateCardProgress(currentListId);
+        }
+    }
+
+    // Add keyboard shortcut for deleting todos (optional)
+    function handleTodoKeyPress(event, todoId) {
+        if (event.key === 'Delete' || event.key === 'Backspace') {
+            if (event.ctrlKey || event.metaKey) {
+                deleteTodo(todoId);
+            }
+        }
+    }
+
+    // Add new todo
+    async function addNewTodo() {
+        const input = document.getElementById('newTodoInput');
+        const description = input.value.trim();
+
+        if (description) {
+            const newTodo = {
+                id: Date.now(), // Temporary ID
+                description: description,
+                completed: false
+            };
+
+            todos.push(newTodo);
+
+            try {
+                const response = await fetch(`/lists/${currentListId}/todos`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `description=${encodeURIComponent(description)}`
+                });
+
+                if (response.ok) {
+                    // In a real app, you'd get the actual ID from the response
+                    const result = await response.json();
+                    newTodo.id = result.id;
+                }
+            } catch (error) {
+                console.error('Error creating todo:', error);
+            }
+
+            input.value = '';
+            renderTodos();
+            updateProgress();
+            updateCardProgress(currentListId);
+        }
+    }
+
+    // Update progress indicator
+    function updateProgress() {
+        const completed = todos.filter(t => t.completed).length;
+        const total = todos.length;
+        document.getElementById('modalProgress').textContent = `${completed}/${total}`;
+    }
+
+    // Update card progress
+    function updateCardProgress(listId) {
+        const completed = todos.filter(t => t.completed).length;
+        const total = todos.length;
+        const progressElement = document.getElementById(`progress-${listId}`);
+        if (progressElement) {
+            progressElement.textContent = `${completed}/${total}`;
+        }
+    }
+
+    // Update list title
+    async function updateListTitle() {
+        const newTitle = document.getElementById('modalListTitle').value.trim();
+        if (newTitle && currentListId) {
+            try {
+                await fetch(`/lists/${currentListId}/update`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `name=${encodeURIComponent(newTitle)}`
+                });
+
+                // Update the card title in the main view
+                const cardTitle = document.querySelector(`[onclick*="${currentListId}"] .card-title`);
+                if (cardTitle) {
+                    cardTitle.textContent = newTitle;
+                }
+            } catch (error) {
+                console.error('Error updating list title:', error);
+            }
+        }
+    }
+
+    // Edit list name (remove the separate modal logic since we're using inline editing)
     document.addEventListener('DOMContentLoaded', function() {
-      document.querySelectorAll('.edit-todo-btn').forEach(button => {
-          button.addEventListener('click', function() {
-              // Read the data from the clicked button
-              const listId = this.getAttribute('data-list-id');
-              const name = this.getAttribute('data-name');
+        // Remove the old edit button functionality since we now edit inline in the modal
+        document.querySelectorAll('.edit-list-name-btn').forEach(button => {
+            button.style.display = 'none'; // Hide the edit buttons on cards
+        });
+    });
 
-              // Set up the modal form
-              const form = document.getElementById('editTodoListForm');
-              const input = document.getElementById('editTodoListName');
+    // Modal functions (assuming these exist in your layout)
+    function openModal(modalId) {
+        document.getElementById(modalId).style.display = 'block';
+    }
 
-              form.action = `/lists/${listId}/update`;
-              input.value = name;
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
 
-              openModal('editTodoListModal');
-          });
-      });
-  });
+    function confirmDelete(message) {
+        return confirm(message);
+    }
 </script>
-
 
 </body>
 </html>
