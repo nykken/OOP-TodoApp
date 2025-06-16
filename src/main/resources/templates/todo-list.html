@@ -487,15 +487,15 @@
           </form>
           <span class="todo-text"
                 th:text="${todo.description}"
-                th:class="${todo.completed ? 'completed' : ''}">
+                th:classappend="${todo.completed ? 'completed' : ''}">
               Todo description
-            </span>
+          </span>
         </div>
         <div class="todo-actions">
-          <a th:href="@{/lists/{listId}/todos/{todoId}/edit(listId=${todoList.id}, todoId=${todo.id})}"
-             class="btn btn-outline-primary btn-sm">
+          <button class="btn btn-sm btn-outline-primary edit-todo-btn"
+            th:attr="data-list-id=${todoList.id}, data-todo-id=${todo.id}, data-description=${todo.description}">
             <i class="fas fa-edit"></i>
-          </a>
+          </button>
           <form th:action="@{/lists/{listId}/todos/{todoId}/delete(listId=${todoList.id}, todoId=${todo.id})}"
                 method="post" style="display: inline;">
             <button type="submit" class="btn btn-outline-danger btn-sm"
@@ -512,7 +512,7 @@
 <!-- Add Todo Modal -->
 <div class="modal" id="addTodoModal">
   <div class="modal-dialog">
-    <form th:action="@{/lists/{id}/todos(id=${todoList.id})}" th:object="${newTodo}" method="post">
+    <form th:action="@{/lists/{listId}/todos(listId=${todoList.id})}" th:object="${newTodo}" method="post">
       <div class="modal-header">
         <h5 class="modal-title">Add New Todo</h5>
         <button type="button" class="btn-close" onclick="closeModal('addTodoModal')">&times;</button>
@@ -539,6 +539,39 @@
   </div>
 </div>
 
+<!-- Edit Todo Modal -->
+<div class="modal" id="editTodoModal">
+  <div class="modal-dialog">
+    <form id="editTodoForm" method="post">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Todo</h5>
+        <button type="button" class="btn-close" onclick="closeModal('editTodoModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="editTodoDescription" class="form-label">Description</label>
+          <input type="text"
+                 class="form-control"
+                 id="editTodoDescription"
+                 name="description"
+                 placeholder="Enter todo description"
+                 required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('editTodoModal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save"></i>
+          Save Changes
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+
+
 <script>
   function confirmDelete(message) {
     return confirm(message || 'Are you sure you want to delete this item?');
@@ -546,6 +579,19 @@
 
   function openModal(modalId) {
     document.getElementById(modalId).classList.add('show');
+  }
+
+  function openEditModal(todoId, currentDescription) {
+    // Set the form action URL to match your existing endpoint
+    const form = document.getElementById('editTodoForm');
+    const listId = /*[[${todoList.id}]]*/ '1'; // Fallback for safety
+    form.action = `/lists/${listId}/todos/${todoId}/update`;
+
+    // Set the current description in the input field
+    document.getElementById('editTodoDescription').value = currentDescription;
+
+    // Open the modal
+    openModal('editTodoModal');
   }
 
   function closeModal(modalId) {
@@ -559,6 +605,15 @@
     }
   }
 
+  function openEditModalSafe(button) {
+    // Get data from the button's data attributes (safer than inline JS)
+    const todoId = button.getAttribute('data-todo-id');
+    const currentDescription = button.getAttribute('data-todo-description');
+
+    // Call the original function
+    openEditModal(todoId, currentDescription);
+  }
+
   // Close modal with Escape key
   document.addEventListener('keydown', function(event) {
     if (event.key === 'Escape') {
@@ -568,6 +623,28 @@
       }
     }
   });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.edit-todo-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            // Read the data from the clicked button
+            const listId = this.getAttribute('data-list-id');
+            const todoId = this.getAttribute('data-todo-id');
+            const description = this.getAttribute('data-description');
+
+            // Set up the modal form
+            const form = document.getElementById('editTodoForm');
+            const input = document.getElementById('editTodoDescription');
+
+            // Set form action with the specific IDs
+            form.action = `/lists/${listId}/todos/${todoId}/update`;
+            input.value = description;
+
+            // ← THIS LINE OPENS THE MODAL
+            openModal('editTodoModal');
+        });
+    });
+});
 </script>
 </body>
 </html>

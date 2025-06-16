@@ -16,6 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/")
@@ -224,7 +225,7 @@ public class TodoWebController {
         return "redirect:/";
     }
 
-    // Edit todo form
+    // Edit todo
     @GetMapping("/lists/{listId}/todos/{todoId}/edit")
     public String editTodoForm(@PathVariable Long listId,
                                @PathVariable Long todoId,
@@ -253,27 +254,22 @@ public class TodoWebController {
     @PostMapping("/lists/{listId}/todos/{todoId}/update")
     public String updateTodo(@PathVariable Long listId,
                              @PathVariable Long todoId,
-                             @Valid @ModelAttribute("editTodoRequest") TodoRequest request,
-                             BindingResult bindingResult,
-                             RedirectAttributes redirectAttributes,
-                             Model model) {
-        if (bindingResult.hasErrors()) {
-            Optional<TodoResponse> todoOpt = todoService.getTodo(listId, todoId);
-            Optional<TodoListResponse> todoListOpt = todoListService.getTodoList(listId);
+                             @RequestParam String description,
+                             RedirectAttributes redirectAttributes) {
 
-            if (todoOpt.isEmpty() || todoListOpt.isEmpty()) {
-                redirectAttributes.addFlashAttribute("errorMessage", "Todo or list not found!");
-                return "redirect:/lists/" + listId;
-            }
+        // Create request object manually
+        TodoRequest request = new TodoRequest();
+        request.setDescription(description);
 
-            model.addAttribute("todoList", todoListOpt.get());
-            model.addAttribute("todo", todoOpt.get());
-            return "edit-todo";
+        // Validate manually if needed
+        if (description == null || description.trim().isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Description cannot be empty!");
+            return "redirect:/lists/" + listId;
         }
 
-        Optional<TodoResponse> updatedTodo = todoService.updateTodo(listId, todoId, request);
+        Optional<TodoResponse> updateResult = todoService.updateTodo(listId, todoId, request);
 
-        if (updatedTodo.isPresent()) {
+        if (updateResult.isPresent()) {
             redirectAttributes.addFlashAttribute("successMessage", "Todo updated successfully!");
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Failed to update todo!");
