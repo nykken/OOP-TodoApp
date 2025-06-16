@@ -39,6 +39,9 @@ public class ConversionUtils {
     static NoteResponse convertNoteToResponse(Note note) {
         NoteResponse response = new NoteResponse();
         response.setId(note.getId());
-        response
+        response.setTitle(note.getTitle());
+        response.setBody(note.getBody());
+
+        return response;
     }
 }

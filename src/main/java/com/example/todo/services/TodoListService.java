@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class TodoListService {
@@ -26,7 +25,7 @@ public class TodoListService {
     public List<TodoListResponse> getAllTodoLists() {
         return todoListRepository.findAll().stream()
                 .map(ConversionUtils::convertListToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public TodoListResponse createTodoList(TodoListRequest request) {

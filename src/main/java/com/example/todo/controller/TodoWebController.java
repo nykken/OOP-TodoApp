@@ -180,7 +180,7 @@ public class TodoWebController {
         return "redirect:/lists/" + listId;
     }
 
-    // Update todo list name
+    // Rename todo list
     @PostMapping("/lists/{listId}/update")
     public String updateTodoList(@PathVariable Long listId,
                                  @Valid @ModelAttribute("editTodoListRequest") TodoListRequest request,
@@ -200,7 +200,7 @@ public class TodoWebController {
             model.addAttribute("todoList", todoList);
             model.addAttribute("todos", todos);
             model.addAttribute("newTodo", new TodoRequest());
-            return "todo-list";
+            return "redirect:/";
         }
 
         Optional<TodoListResponse> updatedList = todoListService.updateTodoList(listId, request);
@@ -211,7 +211,7 @@ public class TodoWebController {
             redirectAttributes.addFlashAttribute("errorMessage", "Failed to update todo list!");
         }
 
-        return "redirect:/lists/" + listId;
+        return "redirect:/";
     }
 
     // Delete todo list

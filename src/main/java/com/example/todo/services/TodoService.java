@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class TodoService {
@@ -32,7 +31,7 @@ public class TodoService {
         return todos.stream()
                 .map(ConversionUtils::convertTodoToResponse)
                 .sorted((t1, t2) -> Boolean.compare(t1.isCompleted(), t2.isCompleted()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     // Get todos in a list, filtered by completion status
@@ -44,7 +43,7 @@ public class TodoService {
         List<Todo> todos = todoRepository.findByTodoListIdAndCompleted(listId, completed);
         return todos.stream()
                 .map(ConversionUtils::convertTodoToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public Optional<TodoResponse> getTodo(Long listId, Long todoId) {
