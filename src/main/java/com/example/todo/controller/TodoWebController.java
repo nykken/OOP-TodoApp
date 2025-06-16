@@ -42,7 +42,7 @@ public class TodoWebController {
         List<TodoListResponse> todoLists = todoListService.getAllTodoLists();
         model.addAttribute("todoLists", todoLists);
         model.addAttribute("newTodoList", new TodoListRequest());
-        return "index2";
+        return "test";
     }
 
     // Create new todo list
