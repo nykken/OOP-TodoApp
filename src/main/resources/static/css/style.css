@@ -53,6 +53,7 @@ color: #5855eb;
 
 /* Main Container */
 .main-container {
+background: white;
 margin: 1rem auto;
 padding: 1rem;
 border-radius: 16px;
@@ -136,7 +137,8 @@ color: #6b7280;
 border: 1px solid #6b7280;
 }
 
-.btn-outline-secondary:hover {
+.btn-outline-secondary:hover,
+.btn-outline-secondary.active {
 background: #6b7280;
 color: white;
 }
@@ -147,7 +149,8 @@ color: #f59e0b;
 border: 1px solid #f59e0b;
 }
 
-.btn-outline-warning:hover {
+.btn-outline-warning:hover,
+.btn-outline-warning.active {
 background: #f59e0b;
 color: white;
 }
@@ -158,7 +161,8 @@ color: #10b981;
 border: 1px solid #10b981;
 }
 
-.btn-outline-success:hover {
+.btn-outline-success:hover,
+.btn-outline-success.active {
 background: #10b981;
 color: white;
 }
@@ -184,10 +188,6 @@ padding: 0;
 color: inherit;
 }
 
-.active {
-background: #6366f1 !important;
-color: white !important;
-}
 
 /* Filter Buttons */
 .filter-section {
@@ -292,17 +292,16 @@ gap: 0.75rem;
 }
 
 .todo-item {
-display: flex;
-justify-content: space-between;
-align-items: center;
-padding: 1rem 1.5rem;
-background: #f8fafc;
-border: 1px solid #e2e8f0;
-border-radius: 8px;
-transition: all 0.2s ease;
-flex-direction: column;
-gap: 1rem;
-text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    flex-direction: row;
+    gap: 1rem;
 }
 
 .todo-item:hover {
@@ -312,13 +311,10 @@ box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.1);
 }
 
 .todo-content {
-background: purple !important;
 display: flex;
 align-items: center;
-color: red !important;
 gap: 1rem;
 flex: 1;
-justify-content: center;
 }
 
 .todo-toggle {

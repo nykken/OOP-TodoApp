@@ -6,5 +6,5 @@ import lombok.Data;
 public class TodoResponse {
     private Long id;
     private String description;
-    private Boolean completed;
+    private boolean completed;
 }

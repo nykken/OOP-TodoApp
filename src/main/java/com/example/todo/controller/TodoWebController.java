@@ -69,32 +69,36 @@ public class TodoWebController {
                                @RequestParam(value = "filter", required = false) String filter,
                                Model model,
                                RedirectAttributes redirectAttributes) {
-        Optional<TodoListResponse> todoListOpt = todoListService.getTodoList(listId);
 
-        if (todoListOpt.isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Todo list not found!");
-            return "redirect:/";
-        }
+        return todoListService.getTodoList(listId)
+                .map(todoList -> {
+                    List<TodoResponse> allTodos = todoService.getTodos(listId);
+                    List<TodoResponse> filteredTodos = Optional.ofNullable(filter)
+                            .map(f -> switch (f) {
+                                case "completed" -> allTodos.stream()
+                                        .filter(TodoResponse::isCompleted)
+                                        .collect(Collectors.toList());
+                                case "pending" -> allTodos.stream()
+                                        .filter(todo -> !todo.isCompleted())
+                                        .collect(Collectors.toList());
+                                default -> allTodos;
+                            })
+                            .orElse(allTodos);
 
-        TodoListResponse todoList = todoListOpt.get();
-        List<TodoResponse> todos;
+                    // Populate model
+                    model.addAttribute("todoList", todoList);
+                    model.addAttribute("todos", filteredTodos);
+                    model.addAttribute("newTodo", new TodoRequest());
+                    model.addAttribute("currentFilter", filter);
+                    model.addAttribute("editTodoListRequest", new TodoListRequest());
+                    model.addAttribute("hasTodos", !allTodos.isEmpty());
 
-        // Apply filter if specified
-        if ("completed".equals(filter)) {
-            todos = todoService.getTodos(listId, true);
-        } else if ("pending".equals(filter)) {
-            todos = todoService.getTodos(listId, false);
-        } else {
-            todos = todoService.getTodos(listId);
-        }
-
-        model.addAttribute("todoList", todoList);
-        model.addAttribute("todos", todos);
-        model.addAttribute("newTodo", new TodoRequest());
-        model.addAttribute("currentFilter", filter);
-        model.addAttribute("editTodoListRequest", new TodoListRequest());
-
-        return "todo-list";
+                    return "todo-list";
+                })
+                .orElseGet(() -> {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Todo list not found!");
+                    return "redirect:/";
+                });
     }
 
     // Create new todo in a list
@@ -145,7 +149,7 @@ public class TodoWebController {
         TodoResponse todo = todoOpt.get();
         Optional<TodoResponse> updatedTodo;
 
-        if (todo.getCompleted()) {
+        if (todo.isCompleted()) {
             updatedTodo = todoService.markTodoAsIncomplete(listId, todoId);
         } else {
             updatedTodo = todoService.markTodoAsComplete(listId, todoId);

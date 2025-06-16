@@ -31,7 +31,7 @@ public class TodoService {
         List<Todo> todos = todoRepository.findByTodoListId(listId);
         return todos.stream()
                 .map(ConversionUtils::convertTodoToResponse)
-                .sorted((t1, t2) -> Boolean.compare(t1.getCompleted(), t2.getCompleted()))
+                .sorted((t1, t2) -> Boolean.compare(t1.isCompleted(), t2.isCompleted()))
                 .collect(Collectors.toList());
     }
 

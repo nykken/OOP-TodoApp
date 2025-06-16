@@ -2,8 +2,10 @@ package com.example.todo.services;
 
 import com.example.todo.dto.TodoListResponse;
 import com.example.todo.dto.TodoResponse;
+import com.example.todo.dto.NoteResponse;
 import com.example.todo.entities.Todo;
 import com.example.todo.entities.TodoList;
+import com.example.todo.entities.Note;
 
 import java.util.List;
 
@@ -32,5 +34,11 @@ public class ConversionUtils {
         response.setCompleted(todo.getCompleted());
 
         return response;
+    }
+
+    static NoteResponse convertNoteToResponse(Note note) {
+        NoteResponse response = new NoteResponse();
+        response.setId(note.getId());
+        response
     }
 }
