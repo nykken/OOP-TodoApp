@@ -4,6 +4,34 @@ padding: 0;
 box-sizing: border-box;
 }
 
+.name-and-edit-icon {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.edit-btn {
+    color: #6366f1; /* Blue color */
+    text-decoration: none;
+    padding: 0.5rem;
+    border-radius: 50%; /* Makes it round */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    width: 2rem;
+    height: 2rem;
+}
+
+.edit-btn:hover {
+    background-color: rgba(99, 102, 241, 0.1); /* Transparent blue background */
+    color: #5855eb; /* Slightly darker blue on hover */
+    transform: scale(1.1); /* Optional: slight grow effect */
+}
+
+.edit-btn i {
+    font-size: 0.875rem; /* Icon size */
+}
 
 body {
 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -53,7 +81,7 @@ color: #5855eb;
 
 /* Main Container */
 .main-container {
-background: white;
+background-color: white;
 margin: 1rem auto;
 padding: 1rem;
 border-radius: 16px;
@@ -62,12 +90,10 @@ margin: 2rem auto;
 padding: 2rem;
 }
 
-/* Change this so that the back icon is there. Where title? */
 /* Header Section */
 .header-section {
 flex-direction: row;
 gap: 1rem;
-text-align: center;
 display: flex;
 justify-content: space-between;
 align-items: center;
@@ -79,6 +105,7 @@ font-size: 1.875rem;
 font-weight: 600;
 color: #1e293b;
 display: flex;
+justify-content: space-between;
 align-items: center;
 gap: 0.75rem;
 }
@@ -191,8 +218,8 @@ color: inherit;
 
 /* Filter Buttons */
 .filter-section {
-justify-content: center;
 display: flex;
+justify-content: start;
 gap: 0.75rem;
 margin-bottom: 2rem;
 flex-wrap: wrap;
@@ -228,16 +255,22 @@ justify-content: center;
 }
 
 .card {
+/* Display & Layout */
+display: flex;
+flex-direction: column;
 flex: 1 1 320px;
-max-width: 400px;
 min-width: 280px;
+max-width: 400px;
+
+/* Appearance */
 background: white;
 border: 1px solid #e2e8f0;
 border-radius: 12px;
 box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+
+/* Interaction */
+cursor: pointer;
 transition: all 0.2s ease;
-display: flex;
-flex-direction: column;
 }
 
 .card:hover {
@@ -248,11 +281,6 @@ box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 .card-body {
 padding: 1.5rem;
 flex-grow: 1;
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-around;
 }
 
 .card-title {
@@ -268,6 +296,7 @@ border-top: 1px solid #f1f5f9;
 background: #f8fafc;
 border-radius: 0 0 12px 12px;
 display: flex;
+justify-content: flex-end;
 gap: 0.5rem;
 }
 
@@ -305,7 +334,6 @@ gap: 0.75rem;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
     transition: all 0.2s ease;
-    flex-direction: row;
     gap: 1rem;
 }
 
@@ -330,6 +358,7 @@ align-items: center;
 .todo-text {
 font-size: 1rem;
 color: #374151;
+
 }
 
 .todo-text.completed {
@@ -374,7 +403,7 @@ display: flex;
 }
 
 .modal-dialog {
-margin: 1 rem;
+margin: 1rem;
 background: white;
 border-radius: 12px;
 width: 90%;

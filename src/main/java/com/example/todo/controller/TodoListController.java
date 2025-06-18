@@ -5,6 +5,7 @@ import com.example.todo.dto.TodoListResponse;
 import com.example.todo.dto.TodoRequest;
 import com.example.todo.dto.TodoResponse;
 import com.example.todo.services.TodoService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,16 +15,14 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
+
 @RestController
-@RequestMapping("/api/todo-lists")
+@RequiredArgsConstructor
 @CrossOrigin(origins = "*")
+@RequestMapping("/api/todo-lists")
 public class TodoListController {
 
-    @Autowired
-    private TodoService todoService;
-
-
-    // ---- LIST OPERATIONS ----
+    private final TodoService todoService;
 
     @GetMapping
     public ResponseEntity<List<TodoListResponse>> getAllTodoLists() {
@@ -57,8 +56,7 @@ public class TodoListController {
 
     @DeleteMapping("/{listId}")
     public ResponseEntity<Void> deleteTodoList(@PathVariable Long listId) {
-        boolean deleted = todoService.deleteTodoList(listId);
-        if (deleted) {
+        if (todoService.deleteTodoList(listId)) {
             return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.notFound().build();

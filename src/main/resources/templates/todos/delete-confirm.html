@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{layout :: head}"></head>
+<body>
+<nav th:insert="~{layout :: nav}"></nav>
+
+<div class="container">
+  <div class="main-container">
+    <div class="header-section">
+      <h1 class="header-title">
+        <a th:href="@{/lists/{id}(id=${todoList.id})}" class="btn btn-outline-secondary">
+          <i class="fas fa-arrow-left"></i>
+          Back
+        </a>
+        Delete Todo
+      </h1>
+    </div>
+
+    <div class="empty-state">
+      <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
+      <h4>Are you sure?</h4>
+      <p>Do you want to delete the todo "<strong th:text="${todo.description}"></strong>"?</p>
+      <p class="text-muted">This action cannot be undone.</p>
+    </div>
+
+    <div class="form-actions" style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
+      <a th:href="@{/lists/{id}(id=${todoList.id})}" class="btn btn-secondary">Cancel</a>
+      <form th:action="@{/lists/{listId}/todos/{todoId}/delete(listId=${todoList.id}, todoId=${todo.id})}"
+            method="post" style="display: inline;">
+        <button type="submit" class="btn btn-outline-danger">
+          <i class="fas fa-trash"></i>
+          Yes, Delete
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+</body>
+</html>

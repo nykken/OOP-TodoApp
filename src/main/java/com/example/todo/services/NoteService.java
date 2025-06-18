@@ -4,6 +4,7 @@ import com.example.todo.dto.NoteRequest;
 import com.example.todo.dto.NoteResponse;
 import com.example.todo.entities.Note;
 import com.example.todo.repositories.NoteRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,10 +12,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class NoteService {
 
-    @Autowired
-    private NoteRepository noteRepository;
+    private final NoteRepository noteRepository;
 
     public Optional<NoteResponse> getNote(Long id) {
         return noteRepository.findById(id)

@@ -5,6 +5,7 @@ import com.example.todo.dto.TodoListResponse;
 import com.example.todo.dto.TodoRequest;
 import com.example.todo.dto.TodoResponse;
 import com.example.todo.services.TodoService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,29 +23,21 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/")
-public class TodoWebController {
+@RequiredArgsConstructor
+public class WebController {
 
-    @Autowired
-    private TodoService todoService;
+    private final TodoService todoService;
 
     // Home page - show all todo lists
     @GetMapping
     public String home(Model model) {
         List<TodoListResponse> todoLists = todoService.getAllTodoLists();
-        Map<Long, String> todoCountsMap = new HashMap<>();
-
-
-        for (TodoListResponse todoList : todoLists) {
-            int total = todoService.getTotalTodoCount(todoList.getId());
-            int completed = todoService.getCompletedTodoCount(todoList.getId());
-        }
-
         model.addAttribute("todoLists", todoLists);
-        model.addAttribute("todoCountsMap", todoCountsMap);
         model.addAttribute("newTodoList", new TodoListRequest());
-        return "index";
+        return "lists";
     }
 
+    // TODO DELETE THIS
     @GetMapping("/test")
     public String testThymeleaf(Model model) {
         List<TodoListResponse> todoLists = todoService.getAllTodoLists();
@@ -53,7 +46,15 @@ public class TodoWebController {
         return "test";
     }
 
-    // Create new todo list
+
+
+    // ===================== LIST OPERATIONS ==================
+    @GetMapping("/lists/new")
+    public String newTodoList(Model model) {
+        model.addAttribute("newTodoList", new TodoListRequest());
+        return "lists/new";
+    }
+
     @PostMapping("/lists")
     public String createTodoList(@Valid @ModelAttribute("newTodoList") TodoListRequest request,
                                  BindingResult bindingResult,
@@ -62,11 +63,10 @@ public class TodoWebController {
         if (bindingResult.hasErrors()) {
             List<TodoListResponse> todoLists = todoService.getAllTodoLists();
             model.addAttribute("todoLists", todoLists);
-            return "index";
+            return "lists";
         }
 
         TodoListResponse createdList = todoService.createTodoList(request);
-        redirectAttributes.addFlashAttribute("successMessage", "Todo list created successfully!");
         return "redirect:/lists/" + createdList.getId();
     }
 
@@ -100,7 +100,7 @@ public class TodoWebController {
                     model.addAttribute("editTodoListRequest", new TodoListRequest());
                     model.addAttribute("hasTodos", !allTodos.isEmpty());
 
-                    return "todo-list";
+                    return "lists/details";
                 })
                 .orElseGet(() -> {
                     redirectAttributes.addFlashAttribute("errorMessage", "Todo list not found!");
@@ -128,7 +128,7 @@ public class TodoWebController {
             model.addAttribute("todoList", todoList);
             model.addAttribute("todos", todos);
             model.addAttribute("editTodoListRequest", new TodoListRequest());
-            return "todo-list";
+            return "lists/details";
         }
 
         Optional<TodoResponse> createdTodo = todoService.createTodo(listId, request);
@@ -201,13 +201,8 @@ public class TodoWebController {
                 return "redirect:/";
             }
 
-            TodoListResponse todoList = todoListOpt.get();
-            List<TodoResponse> todos = todoService.getTodos(listId);
-
-            model.addAttribute("todoList", todoList);
-            model.addAttribute("todos", todos);
-            model.addAttribute("newTodo", new TodoRequest());
-            return "redirect:/";
+            model.addAttribute("todoList", todoListOpt.get());
+            return "lists/edit"; // Return to edit form with errors
         }
 
         Optional<TodoListResponse> updatedList = todoService.updateTodoList(listId, request);
@@ -218,7 +213,8 @@ public class TodoWebController {
             redirectAttributes.addFlashAttribute("errorMessage", "Failed to update todo list!");
         }
 
-        return "redirect:/";
+        // Redirect to the details page instead of edit page
+        return "redirect:/lists/" + listId;
     }
 
     // Delete todo list
@@ -258,7 +254,7 @@ public class TodoWebController {
         model.addAttribute("todo", todo);
         model.addAttribute("editTodoRequest", editRequest);
 
-        return "edit-todo";
+        return "todos/edit";
     }
 
     // Update todo
@@ -288,4 +284,66 @@ public class TodoWebController {
 
         return "redirect:/lists/" + listId;
     }
+
+    @GetMapping("/lists/{id}/edit")
+    public String editTodoList(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+        Optional<TodoListResponse> todoListOpt = todoService.getTodoList(id);
+        if (todoListOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Todo list not found!");
+            return "redirect:/";
+        }
+
+        TodoListResponse todoList = todoListOpt.get();
+        TodoListRequest editRequest = new TodoListRequest();
+        editRequest.setName(todoList.getName());
+
+        model.addAttribute("todoList", todoList);
+        model.addAttribute("editTodoListRequest", editRequest);
+        return "lists/edit";
+    }
+
+    @GetMapping("/lists/{id}/delete-confirm")
+    public String confirmDeleteTodoList(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+        Optional<TodoListResponse> todoListOpt = todoService.getTodoList(id);
+        if (todoListOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Todo list not found!");
+            return "redirect:/";
+        }
+
+        model.addAttribute("todoList", todoListOpt.get());
+        return "lists/delete-confirm";
+    }
+
+    // ---- NEW TODO MANAGEMENT PAGES ----
+
+    @GetMapping("/lists/{listId}/todos/new")
+    public String newTodo(@PathVariable Long listId, Model model, RedirectAttributes redirectAttributes) {
+        Optional<TodoListResponse> todoListOpt = todoService.getTodoList(listId);
+        if (todoListOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Todo list not found!");
+            return "redirect:/";
+        }
+
+        model.addAttribute("todoList", todoListOpt.get());
+        model.addAttribute("newTodo", new TodoRequest());
+        return "todos/new";
+    }
+
+    @GetMapping("/lists/{listId}/todos/{todoId}/delete-confirm")
+    public String confirmDeleteTodo(@PathVariable Long listId, @PathVariable Long todoId,
+                                    Model model, RedirectAttributes redirectAttributes) {
+        Optional<TodoListResponse> todoListOpt = todoService.getTodoList(listId);
+        Optional<TodoResponse> todoOpt = todoService.getTodo(listId, todoId);
+
+        if (todoListOpt.isEmpty() || todoOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Todo or list not found!");
+            return "redirect:/lists/" + listId;
+        }
+
+        model.addAttribute("todoList", todoListOpt.get());
+        model.addAttribute("todo", todoOpt.get());
+        return "todos/delete-confirm";
+    }
+
+
 }

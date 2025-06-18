@@ -9,21 +9,20 @@ import com.example.todo.entities.TodoList;
 import com.example.todo.repositories.TodoListRepository;
 import com.example.todo.repositories.TodoRepository;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class TodoService {
 
-    @Autowired
-    private TodoRepository todoRepository;
-
-    @Autowired
-    private TodoListRepository todoListRepository;
+    private final TodoRepository todoRepository;
+    private final TodoListRepository todoListRepository;
 
     public Optional<TodoListResponse> getTodoList(Long id) {
         return todoListRepository.findById(id)
@@ -53,39 +52,16 @@ public class TodoService {
 
     @Transactional
     public boolean deleteTodoList(Long id) {
-        if (todoListRepository.existsById(id)) {
-            todoListRepository.deleteById(id);
+        Optional<TodoList> todoList = todoListRepository.findById(id);
+        if (todoList.isPresent()) {
+            todoListRepository.delete(todoList.get());
             return true;
         }
         return false;
     }
 
-    // Check if TodoList exists
-    public boolean exists(Long id) {
-        return todoListRepository.existsById(id);
-    }
-
-    public int getTotalTodoCount(Long listId) {
-        return getTodos(listId).size();
-    }
-
-    public int getCompletedTodoCount(Long listId) {
-        return (int) getTodos(listId).stream()
-                .filter(TodoResponse::isCompleted)
-                .count();
-    }
-
-    public Optional<TodoList> getTodoListEntity(Long id) {
-        return todoListRepository.findById(id);
-    }
-
     // Get all todos in a list
     public List<TodoResponse> getTodos(Long listId) {
-        if (!exists(listId)) {
-            return Collections.emptyList();
-        }
-
-        // Sort the todos - pending first
         List<Todo> todos = todoRepository.findByTodoListId(listId);
         return todos.stream()
                 .map(ConversionUtils::convertTodoToResponse)
@@ -95,10 +71,6 @@ public class TodoService {
 
     // Get todos in a list, filtered by completion status
     public List<TodoResponse> getTodos(Long listId, Boolean completed) {
-        if (!exists(listId)) {
-            return Collections.emptyList();
-        }
-
         List<Todo> todos = todoRepository.findByTodoListIdAndCompleted(listId, completed);
         return todos.stream()
                 .map(ConversionUtils::convertTodoToResponse)
@@ -106,22 +78,17 @@ public class TodoService {
     }
 
     public Optional<TodoResponse> getTodo(Long listId, Long todoId) {
-        if (!exists(listId)) {
-            return Optional.empty();
-        }
-
         return todoRepository.findByIdAndTodoListId(todoId, listId)
                 .map(ConversionUtils::convertTodoToResponse);
     }
 
     public Optional<TodoResponse> createTodo(Long listId, TodoRequest request) {
-        return getTodoListEntity(listId)
+        return todoListRepository.findById(listId)
                 .map(todoList -> {
                     Todo todo = new Todo(request.getDescription(), todoList);
                     Todo savedTodo = todoRepository.save(todo);
                     return ConversionUtils.convertTodoToResponse(savedTodo);
                 });
-
     }
 
     public Optional<TodoResponse> updateTodo(Long listId, Long todoId, TodoRequest request) {

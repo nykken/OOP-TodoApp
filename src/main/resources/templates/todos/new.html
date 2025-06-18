@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{layout :: head}"></head>
+<body>
+<nav th:insert="~{layout :: nav}"></nav>
+
+<div class="container">
+  <div class="main-container">
+    <div class="header-section">
+      <h1 class="header-title">
+        <a th:href="@{/lists/{id}(id=${todoList.id})}" class="btn btn-outline-secondary">
+          <i class="fas fa-arrow-left"></i>
+          Back
+        </a>
+        Add New Todo
+      </h1>
+    </div>
+
+    <form th:action="@{/lists/{listId}/todos(listId=${todoList.id})}" th:object="${newTodo}" method="post">
+      <div class="form-group">
+        <label for="todoDescription" class="form-label">Description</label>
+        <input type="text"
+               class="form-control"
+               id="todoDescription"
+               th:field="*{description}"
+               placeholder="Enter todo description"
+               autofocus
+               required>
+      </div>
+      <div class="form-actions" style="margin-top: 1rem; display: flex; gap: 1rem;">
+        <a th:href="@{/lists/{id}(id=${todoList.id})}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-plus"></i>
+          Add Todo
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+</body>
+</html>
