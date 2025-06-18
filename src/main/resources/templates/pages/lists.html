@@ -3,7 +3,7 @@
 <head th:insert="~{layout :: head}"></head>
 <body>
 <!-- Navigation -->
-<nav th:insert="~{layout :: nav}"></nav>
+<!--<nav th:insert="~{layout :: nav}"></nav>-->
 
 <!-- Main Content -->
 <div class="container">
@@ -14,39 +14,54 @@
                 <i class="fas fa-list"></i>
                 Todo Lists
             </h1>
-            <a href="/lists/new" class="btn btn-primary">
+            <a th:href="@{/lists/new}" class="btn btn-primary">
                 <i class="fas fa-plus"></i>
                 New List
             </a>
         </div>
 
-        <!-- No Todo Lists Message -->
-        <div th:if="${todoLists == null or #lists.isEmpty(todoLists)}" class="empty-state">
-            <i class="fas fa-clipboard-list"></i>
-            <h4>No todo lists yet</h4>
-            <p>Create your first todo list to get started!</p>
+        <!-- No Items Message -->
+        <div th:if="${dashboardItems == null or #lists.isEmpty(dashboardItems)}" class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <h4>No content yet</h4>
+            <p>Create your first todo list or note to get started!</p>
         </div>
 
-        <!-- Todo Lists Cards -->
-        <div class="cards-container" th:if="${todoLists != null and not #lists.isEmpty(todoLists)}">
-            <div class="card" th:each="todoList : ${todoLists}" th:if="${todoList != null}">
+        <!-- Unified Dashboard Items -->
+        <div class="cards-container" th:if="${dashboardItems != null and not #lists.isEmpty(dashboardItems)}">
+            <div class="card" th:each="item : ${dashboardItems}">
                 <div class="card-body clickable-card"
                      role="button"
                      tabindex="0"
-                     th:onclick="'window.location.href = \'/lists/\' + ' + ${todoList.id}"
+                     th:data-url="${item.progressString != null ? '/lists/' + item.id : '/notes/' + item.id}"
+                     onclick="window.location.href = this.dataset.url"
                 >
                     <div class="card-header">
-                        <h2 class="card-title" th:text="${todoList.name}"></h2>
+                        <div class="card-type">
+                            <i th:class="${item.progressString != null ? 'fas fa-list' : 'fas fa-sticky-note'}"></i>
+                            <span class="type-label" th:text="${item.progressString != null ? 'Todo List' : 'Note'}"></span>
+                        </div>
+                        <h2 class="card-title" th:text="${item.title}"></h2>
                     </div>
-                    <!-- Completed over total badge -->
-                    <div class="badge">
-                        <span th:text="${todoList.completedTodos}"></span> /
-                        <span th:text="${todoList.totalTodos}"></span>
+
+                    <!-- Progress badge (only for TodoLists) -->
+                    <div th:if="${item.progressString != null}" class="badge">
+                        <span th:text="${item.progressString}"></span>
                     </div>
-                    <p class="text-muted">Click to view todos</p>
+
+                    <!-- Preview text -->
+                    <p class="note-preview" th:text="${item.preview}"></p>
+
+                    <div class="card-timestamp">
+                        <span th:text="${@timeUtil.lastEdited(item.updatedAt)}">Last edited</span>
+                    </div>
                 </div>
+
+                <!-- Card Footer with Actions -->
                 <div class="card-footer">
-                    <a th:href="@{/templates/pages/lists/{id}/delete-confirm(id=${todoList.id})}" class="btn btn-outline-danger btn-sm">
+                    <!-- Conditional delete URL based on item type -->
+                    <a th:href="${item.progressString != null ? '/lists/' + item.id + '/delete-confirm' : '/notes/' + item.id + '/delete-confirm'}"
+                       class="btn btn-outline-danger btn-sm">
                         <i class="fas fa-trash"></i>
                         Delete
                     </a>

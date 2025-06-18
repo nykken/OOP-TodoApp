@@ -1,11 +1,6 @@
 package com.example.todo.controller;
 
-import com.example.todo.dto.NoteRequest;
-import com.example.todo.dto.NoteResponse;
-import com.example.todo.dto.TodoListRequest;
-import com.example.todo.dto.TodoListResponse;
-import com.example.todo.dto.TodoRequest;
-import com.example.todo.dto.TodoResponse;
+import com.example.todo.dto.*;
 import com.example.todo.services.NoteService;
 import com.example.todo.services.TodoService;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +12,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,18 +25,24 @@ public class WebController {
     private final TodoService todoService;
     private final NoteService noteService;
 
-    // Home page - show all todo lists
     @GetMapping
     public String home(Model model) {
         List<TodoListResponse> todoLists = todoService.getAllTodoLists();
         List<NoteResponse> notes = noteService.getAllNotes();
 
-        model.addAttribute("todoLists", todoLists);
-        model.addAttribute("notes", notes);
+        List<DashboardItem> dashboardItems = new ArrayList<>();
+        dashboardItems.addAll(todoLists);
+        dashboardItems.addAll(notes);
+
+        dashboardItems.sort((a, b) -> b.getUpdatedAt().compareTo(a.getUpdatedAt()));
+
+
+        model.addAttribute("dashboardItems", dashboardItems);
         model.addAttribute("newTodoList", new TodoListRequest());
         model.addAttribute("newNote", new NoteRequest());
-        return "lists";
+        return "pages/lists";
     }
+
 
     // TODO DELETE THIS
     @GetMapping("/test")
@@ -56,7 +59,7 @@ public class WebController {
     @GetMapping("/lists/new")
     public String newTodoList(Model model) {
         model.addAttribute("newTodoList", new TodoListRequest());
-        return "lists/new";
+        return "/pages/lists/new";
     }
 
     @PostMapping("/lists")
@@ -67,11 +70,11 @@ public class WebController {
         if (bindingResult.hasErrors()) {
             List<TodoListResponse> todoLists = todoService.getAllTodoLists();
             model.addAttribute("todoLists", todoLists);
-            return "lists";
+            return "pages/lists";
         }
 
         TodoListResponse createdList = todoService.createTodoList(request);
-        return "redirect:/lists/" + createdList.getId();
+        return "redirect:lists/" + createdList.getId();
     }
 
     // Show specific todo list with todos
@@ -104,7 +107,7 @@ public class WebController {
                     model.addAttribute("editTodoListRequest", new TodoListRequest());
                     model.addAttribute("hasTodos", !allTodos.isEmpty());
 
-                    return "lists/details";
+                    return "/pages/lists/details";
                 })
                 .orElseGet(() -> {
                     redirectAttributes.addFlashAttribute("errorMessage", "Todo list not found!");
@@ -113,7 +116,7 @@ public class WebController {
     }
 
     // Create new todo in a list
-    @PostMapping("/lists/{listId}/todos")
+    @PostMapping("lists/{listId}/todos")
     public String createTodo(@PathVariable Long listId,
                              @Valid @ModelAttribute("newTodo") TodoRequest request,
                              BindingResult bindingResult,
@@ -126,7 +129,7 @@ public class WebController {
                         model.addAttribute("todoList", todoList);
                         model.addAttribute("todos", todoService.getTodos(listId));
                         model.addAttribute("editTodoListRequest", new TodoListRequest());
-                        return "lists/details";
+                        return "/pages/lists/details";
                     })
                     .orElseGet(() -> {
                         redirectAttributes.addFlashAttribute("errorMessage", "Todo list not found!");
@@ -143,7 +146,7 @@ public class WebController {
     }
 
     // Toggle todo completion status
-    @PostMapping("/lists/{listId}/todos/{todoId}/toggle")
+    @PostMapping("lists/{listId}/todos/{todoId}/toggle")
     public String toggleTodoCompletion(@PathVariable Long listId,
                                        @PathVariable Long todoId,
                                        RedirectAttributes redirectAttributes) {
@@ -166,7 +169,7 @@ public class WebController {
     }
 
     // Delete todo
-    @PostMapping("/lists/{listId}/todos/{todoId}/delete")
+    @PostMapping("lists/{listId}/todos/{todoId}/delete")
     public String deleteTodo(@PathVariable Long listId,
                              @PathVariable Long todoId,
                              RedirectAttributes redirectAttributes) {
@@ -178,7 +181,7 @@ public class WebController {
     }
 
     // Rename todo list
-    @PostMapping("/lists/{listId}/update")
+    @PostMapping("lists/{listId}/update")
     public String updateTodoList(@PathVariable Long listId,
                                  @Valid @ModelAttribute("editTodoListRequest") TodoListRequest request,
                                  BindingResult bindingResult,
@@ -192,7 +195,7 @@ public class WebController {
             }
 
             model.addAttribute("todoList", todoListOpt.get());
-            return "lists/edit"; // Return to edit form with errors
+            return "pages/lists/edit"; // Return to edit form with errors
         }
 
         Optional<TodoListResponse> updatedList = todoService.updateTodoList(listId, request);
@@ -215,7 +218,7 @@ public class WebController {
     }
 
     // Edit todo
-    @GetMapping("/lists/{listId}/todos/{todoId}/edit")
+    @GetMapping("lists/{listId}/todos/{todoId}/edit")
     public String editTodoForm(@PathVariable Long listId,
                                @PathVariable Long todoId,
                                Model model,
@@ -236,11 +239,11 @@ public class WebController {
         model.addAttribute("todo", todo);
         model.addAttribute("editTodoRequest", editRequest);
 
-        return "todos/edit";
+        return "pages/todos/edit";
     }
 
     // Update todo
-    @PostMapping("/lists/{listId}/todos/{todoId}/update")
+    @PostMapping("lists/{listId}/todos/{todoId}/update")
     public String updateTodo(@PathVariable Long listId,
                              @PathVariable Long todoId,
                              @RequestParam String description,
@@ -275,7 +278,7 @@ public class WebController {
 
         model.addAttribute("todoList", todoList);
         model.addAttribute("editTodoListRequest", editRequest);
-        return "lists/edit";
+        return "pages/lists/edit";
     }
 
     @GetMapping("/lists/{id}/delete-confirm")
@@ -287,7 +290,7 @@ public class WebController {
         }
 
         model.addAttribute("todoList", todoListOpt.get());
-        return "lists/delete-confirm";
+        return "pages/lists/delete-confirm";
     }
 
     // ---- NEW TODO MANAGEMENT PAGES ----
@@ -302,7 +305,7 @@ public class WebController {
 
         model.addAttribute("todoList", todoListOpt.get());
         model.addAttribute("newTodo", new TodoRequest());
-        return "todos/new";
+        return "pages/todos/new";
     }
 
     @GetMapping("/lists/{listId}/todos/{todoId}/delete-confirm")
@@ -318,7 +321,7 @@ public class WebController {
 
         model.addAttribute("todoList", todoListOpt.get());
         model.addAttribute("todo", todoOpt.get());
-        return "todos/delete-confirm";
+        return "pages/todos/delete-confirm";
     }
 
     // ===================== NOTE OPERATIONS ==================
@@ -326,7 +329,7 @@ public class WebController {
     @GetMapping("/notes/new")
     public String newNote(Model model) {
         model.addAttribute("newNote", new NoteRequest());
-        return "notes/new";
+        return "pages/notes/new";
     }
 
     @PostMapping("/notes")
@@ -340,7 +343,7 @@ public class WebController {
             model.addAttribute("todoLists", todoLists);
             model.addAttribute("notes", notes);
             model.addAttribute("newTodoList", new TodoListRequest());
-            return "lists";
+            return "pages/lists";
         }
 
         var createdNote = noteService.createNote(request);

@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-public class TodoListResponse {
+public class TodoListResponse implements DashboardItem {
     private Long id;
     private String name;
     private List<TodoResponse> todos;
@@ -26,5 +26,17 @@ public class TodoListResponse {
 
     public int getPendingTodos() {
         return getTotalTodos() - getCompletedTodos();
+    }
+
+    public String getProgressString() {
+        return getCompletedTodos() + "/" + getTotalTodos();
+    }
+
+    public String getTitle() {
+        return name;
+    }
+
+    public String getPreview() {
+        return "this is a todolist preview tralala";
     }
 }

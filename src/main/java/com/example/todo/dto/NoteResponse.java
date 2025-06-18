@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class NoteResponse {
+public class NoteResponse implements DashboardItem {
     private Long id;
     private String title;
     private String body;
@@ -18,5 +18,10 @@ public class NoteResponse {
             return "No content yet.";
         }
         return body.length() > 100 ? body.substring(0, 100) + "..." : body;
+    }
+
+    // Notes do not have progress
+    public String getProgressString() {
+        return null;
     }
 }

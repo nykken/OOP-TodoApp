@@ -28,7 +28,7 @@ public class Note {
     private LocalDateTime createdAt;
 
     @LastModifiedDate
-    @Column(name = "update_at", nullable = false)
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
     public Note(String title, String body) {

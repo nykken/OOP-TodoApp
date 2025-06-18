@@ -14,10 +14,10 @@
                 <i class="fas fa-list"></i>
                 Todo Lists
             </h1>
-            <button class="btn btn-primary" onclick="openModal('createListModal')">
+            <a href="/lists/new" class="btn btn-primary">
                 <i class="fas fa-plus"></i>
                 New List
-            </button>
+            </a>
         </div>
 
         <!-- No Todo Lists Message -->
@@ -27,120 +27,35 @@
             <p>Create your first todo list to get started!</p>
         </div>
 
-
         <!-- Todo Lists Cards -->
         <div class="cards-container" th:if="${todoLists != null and not #lists.isEmpty(todoLists)}">
             <div class="card" th:each="todoList : ${todoLists}" th:if="${todoList != null}">
-                <div class="card-body">
+                <div class="card-body clickable-card"
+                     role="button"
+                     tabindex="0"
+                     th:onclick="'window.location.href = \'/lists/\' + ' + ${todoList.id}"
+                >
                     <div class="card-header">
-                        <h5 class="card-title" th:text="${todoList.name}"></h5>
-                        <button class="btn btn-sm btn-outline-primary edit-todo-btn"
-                                th:attr="data-list-id=${todoList.id}, data-description=${todoList.name}">
-                            <i class="fas fa-edit"></i>
-                        </button>
+                        <h2 class="card-title" th:text="${todoList.name}"></h2>
                     </div>
-                    <div class="badge">0/0</div>
+                    <!-- Completed over total badge -->
+                    <div class="badge">
+                        <span th:text="${todoList.completedTodos}"></span> /
+                        <span th:text="${todoList.totalTodos}"></span>
+                    </div>
                     <p class="text-muted">Click to view todos</p>
                 </div>
                 <div class="card-footer">
-                    <button type="button" class="btn btn-outline-primary btn-sm" th:onclick="'window.location.href = \'/lists/\' + ' + ${todoList.id}">
-                        <i class="fas fa-eye"></i>
-                        View
-                    </button>
-                    <form th:if="${todoList.id != null}" th:action="@{/templates/pages/lists/{id}/delete(id=${todoList.id})}" method="post" style="display: inline;">
-                        <button type="submit" class="btn btn-outline-danger btn-sm"
-                                onclick="return confirmDelete('Are you sure you want to delete this todo list?')">
-                            <i class="fas fa-trash"></i>
-                            Delete
-                        </button>
-                    </form>
+                    <a th:href="@{/templates/pages/lists/{id}/delete-confirm(id=${todoList.id})}" class="btn btn-outline-danger btn-sm">
+                        <i class="fas fa-trash"></i>
+                        Delete
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Create Todo List Modal -->
-<div class="modal" id="createListModal">
-    <div class="modal-dialog">
-        <form th:action="@{/templates/pages/lists}" th:object="${newTodoList}" method="post">
-            <div class="modal-header">
-                <h5 class="modal-title">Create New Todo List</h5>
-                <button type="button" class="btn-close" onclick="closeModal('createListModal')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="listName" class="form-label">List Name</label>
-                    <input type="text"
-                           class="form-control"
-                           id="listName"
-                           th:field="*{name}"
-                           placeholder="Enter list name"
-                           required>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('createListModal')">Cancel</button>
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-plus"></i>
-                    Create List
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Edit Todo Modal -->
-<div class="modal" id="editTodoListModal">
-    <div class="modal-dialog">
-        <form id="editTodoListForm" method="post">
-            <div class="modal-header">
-                <h5 class="modal-title">Rename</h5>
-                <button type="button" class="btn-close" onclick="closeModal('editTodoListModal')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="editTodoListName" class="form-label">Name</label>
-                    <input type="text"
-                           class="form-control"
-                           id="editTodoListName"
-                           name="name"
-                           placeholder="Enter todo list name"
-                           required>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('editTodoListModal')">Cancel</button>
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i>
-                    Save Changes
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-      document.querySelectorAll('.edit-todo-btn').forEach(button => {
-          button.addEventListener('click', function() {
-              // Read the data from the clicked button
-              const listId = this.getAttribute('data-list-id');
-              const name = this.getAttribute('data-name');
-
-              // Set up the modal form
-              const form = document.getElementById('editTodoListForm');
-              const input = document.getElementById('editTodoListName');
-
-              form.action = `/lists/${listId}/update`;
-              input.value = name;
-
-              openModal('editTodoListModal');
-          });
-      });
-  });
-</script>
-
-
+<div th:insert="~{layout :: fab}"></div>
 </body>
 </html>
