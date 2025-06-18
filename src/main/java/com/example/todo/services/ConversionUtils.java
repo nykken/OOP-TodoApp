@@ -16,6 +16,8 @@ public class ConversionUtils {
         TodoListResponse response = new TodoListResponse();
         response.setId(todoList.getId());
         response.setName(todoList.getName());
+        response.setCreatedAt(todoList.getCreatedAt());
+        response.setUpdatedAt(todoList.getUpdatedAt());
 
         List<TodoResponse> todos = todoList.getTodos()
                 .stream()
@@ -41,6 +43,8 @@ public class ConversionUtils {
         response.setId(note.getId());
         response.setTitle(note.getTitle());
         response.setBody(note.getBody());
+        response.setCreatedAt(note.getCreatedAt());
+        response.setUpdatedAt(note.getUpdatedAt());
 
         return response;
     }

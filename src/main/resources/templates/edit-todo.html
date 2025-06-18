@@ -15,7 +15,7 @@
                 </a>
             </li>
             <li class="breadcrumb-item">
-                <a th:href="@{/lists/{id}(id=${todoList.id})}" th:text="${todoList.name}">
+                <a th:href="@{/templates/pages/lists/{id}(id=${todoList.id})}" th:text="${todoList.name}">
                     Todo List
                 </a>
             </li>
@@ -32,7 +32,7 @@
                     </h4>
                 </div>
                 <div class="card-body">
-                    <form th:action="@{/lists/{listId}/todos/{todoId}/update(listId=${todoList.id}, todoId=${todo.id})}"
+                    <form th:action="@{/templates/pages/lists/{listId}/todos/{todoId}/update(listId=${todoList.id}, todoId=${todo.id})}"
                           th:object="${editTodoRequest}"
                           method="post">
 
@@ -72,7 +72,7 @@
                         </div>
 
                         <div class="d-flex justify-content-between">
-                            <a th:href="@{/lists/{id}(id=${todoList.id})}"
+                            <a th:href="@{/templates/pages/lists/{id}(id=${todoList.id})}"
                                class="btn btn-secondary">
                                 <i class="fas fa-arrow-left me-2"></i>Cancel
                             </a>
@@ -94,7 +94,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-6">
-                            <form th:action="@{/lists/{listId}/todos/{todoId}/toggle(listId=${todoList.id}, todoId=${todo.id})}"
+                            <form th:action="@{/templates/pages/lists/{listId}/todos/{todoId}/toggle(listId=${todoList.id}, todoId=${todo.id})}"
                                   method="post" class="d-grid">
                                 <button type="submit"
                                         class="btn btn-sm"
@@ -105,7 +105,7 @@
                             </form>
                         </div>
                         <div class="col-6">
-                            <form th:action="@{/lists/{listId}/todos/{todoId}/delete(listId=${todoList.id}, todoId=${todo.id})}"
+                            <form th:action="@{/templates/pages/lists/{listId}/todos/{todoId}/delete(listId=${todoList.id}, todoId=${todo.id})}"
                                   method="post" class="d-grid">
                                 <button type="submit"
                                         class="btn btn-outline-danger btn-sm"

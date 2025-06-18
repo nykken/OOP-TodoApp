@@ -2,6 +2,7 @@ package com.example.todo.dto;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -9,6 +10,9 @@ public class TodoListResponse {
     private Long id;
     private String name;
     private List<TodoResponse> todos;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
 
     public int getTotalTodos() {
         return todos != null ? todos.size() : 0;

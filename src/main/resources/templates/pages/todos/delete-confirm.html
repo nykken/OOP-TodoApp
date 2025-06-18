@@ -8,7 +8,7 @@
   <div class="main-container">
     <div class="header-section">
       <h1 class="header-title">
-        <a th:href="@{/lists/{id}(id=${todoList.id})}" class="btn btn-outline-secondary">
+        <a th:href="@{/templates/pages/lists/{id}(id=${todoList.id})}" class="btn btn-outline-secondary">
           <i class="fas fa-arrow-left"></i>
           Back
         </a>
@@ -24,8 +24,8 @@
     </div>
 
     <div class="form-actions" style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
-      <a th:href="@{/lists/{id}(id=${todoList.id})}" class="btn btn-secondary">Cancel</a>
-      <form th:action="@{/lists/{listId}/todos/{todoId}/delete(listId=${todoList.id}, todoId=${todo.id})}"
+      <a th:href="@{/templates/pages/lists/{id}(id=${todoList.id})}" class="btn btn-secondary">Cancel</a>
+      <form th:action="@{/templates/pages/lists/{listId}/todos/{todoId}/delete(listId=${todoList.id}, todoId=${todo.id})}"
             method="post" style="display: inline;">
         <button type="submit" class="btn btn-outline-danger">
           <i class="fas fa-trash"></i>

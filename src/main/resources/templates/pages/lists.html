@@ -46,7 +46,7 @@
                     <p class="text-muted">Click to view todos</p>
                 </div>
                 <div class="card-footer">
-                    <a th:href="@{/lists/{id}/delete-confirm(id=${todoList.id})}" class="btn btn-outline-danger btn-sm">
+                    <a th:href="@{/templates/pages/lists/{id}/delete-confirm(id=${todoList.id})}" class="btn btn-outline-danger btn-sm">
                         <i class="fas fa-trash"></i>
                         Delete
                     </a>
@@ -55,5 +55,7 @@
         </div>
     </div>
 </div>
+
+<div th:insert="~{layout :: fab}"></div>
 </body>
 </html>

@@ -1,12 +1,14 @@
 package com.example.todo.controller;
 
+import com.example.todo.dto.NoteRequest;
+import com.example.todo.dto.NoteResponse;
 import com.example.todo.dto.TodoListRequest;
 import com.example.todo.dto.TodoListResponse;
 import com.example.todo.dto.TodoRequest;
 import com.example.todo.dto.TodoResponse;
+import com.example.todo.services.NoteService;
 import com.example.todo.services.TodoService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -15,11 +17,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/")
@@ -27,13 +26,18 @@ import java.util.stream.Collectors;
 public class WebController {
 
     private final TodoService todoService;
+    private final NoteService noteService;
 
     // Home page - show all todo lists
     @GetMapping
     public String home(Model model) {
         List<TodoListResponse> todoLists = todoService.getAllTodoLists();
+        List<NoteResponse> notes = noteService.getAllNotes();
+
         model.addAttribute("todoLists", todoLists);
+        model.addAttribute("notes", notes);
         model.addAttribute("newTodoList", new TodoListRequest());
+        model.addAttribute("newNote", new NoteRequest());
         return "lists";
     }
 
@@ -84,10 +88,10 @@ public class WebController {
                             .map(f -> switch (f) {
                                 case "completed" -> allTodos.stream()
                                         .filter(TodoResponse::isCompleted)
-                                        .collect(Collectors.toList());
+                                        .toList();
                                 case "pending" -> allTodos.stream()
                                         .filter(todo -> !todo.isCompleted())
-                                        .collect(Collectors.toList());
+                                        .toList();
                                 default -> allTodos;
                             })
                             .orElse(allTodos);
@@ -115,26 +119,23 @@ public class WebController {
                              BindingResult bindingResult,
                              RedirectAttributes redirectAttributes,
                              Model model) {
+
         if (bindingResult.hasErrors()) {
-            Optional<TodoListResponse> todoListOpt = todoService.getTodoList(listId);
-            if (todoListOpt.isEmpty()) {
-                redirectAttributes.addFlashAttribute("errorMessage", "Todo list not found!");
-                return "redirect:/";
-            }
-
-            TodoListResponse todoList = todoListOpt.get();
-            List<TodoResponse> todos = todoService.getTodos(listId);
-
-            model.addAttribute("todoList", todoList);
-            model.addAttribute("todos", todos);
-            model.addAttribute("editTodoListRequest", new TodoListRequest());
-            return "lists/details";
+            return todoService.getTodoList(listId)
+                    .map(todoList -> {
+                        model.addAttribute("todoList", todoList);
+                        model.addAttribute("todos", todoService.getTodos(listId));
+                        model.addAttribute("editTodoListRequest", new TodoListRequest());
+                        return "lists/details";
+                    })
+                    .orElseGet(() -> {
+                        redirectAttributes.addFlashAttribute("errorMessage", "Todo list not found!");
+                        return "redirect:/";
+                    });
         }
 
         Optional<TodoResponse> createdTodo = todoService.createTodo(listId, request);
-        if (createdTodo.isPresent()) {
-            redirectAttributes.addFlashAttribute("successMessage", "Todo added successfully!");
-        } else {
+        if (createdTodo.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Failed to create todo!");
         }
 
@@ -146,29 +147,22 @@ public class WebController {
     public String toggleTodoCompletion(@PathVariable Long listId,
                                        @PathVariable Long todoId,
                                        RedirectAttributes redirectAttributes) {
-        Optional<TodoResponse> todoOpt = todoService.getTodo(listId, todoId);
 
-        if (todoOpt.isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Todo not found!");
-            return "redirect:/lists/" + listId;
-        }
+        return todoService.getTodo(listId, todoId)
+                .map(todo -> {
+                    var result = todo.isCompleted()
+                            ? todoService.markTodoAsIncomplete(listId, todoId)
+                            : todoService.markTodoAsComplete(listId, todoId);
 
-        TodoResponse todo = todoOpt.get();
-        Optional<TodoResponse> updatedTodo;
-
-        if (todo.isCompleted()) {
-            updatedTodo = todoService.markTodoAsIncomplete(listId, todoId);
-        } else {
-            updatedTodo = todoService.markTodoAsComplete(listId, todoId);
-        }
-
-        if (updatedTodo.isPresent()) {
-            redirectAttributes.addFlashAttribute("successMessage", "Todo updated successfully!");
-        } else {
-            redirectAttributes.addFlashAttribute("errorMessage", "Failed to update todo!");
-        }
-
-        return "redirect:/lists/" + listId;
+                    if (result.isEmpty()) {
+                        redirectAttributes.addFlashAttribute("errorMessage", "Failed to update todo!");
+                    }
+                    return "redirect:/lists/" + listId;
+                })
+                .orElseGet(() -> {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Todo not found!");
+                    return "redirect:/lists/" + listId;
+                });
     }
 
     // Delete todo
@@ -176,14 +170,10 @@ public class WebController {
     public String deleteTodo(@PathVariable Long listId,
                              @PathVariable Long todoId,
                              RedirectAttributes redirectAttributes) {
-        boolean deleted = todoService.deleteTodo(listId, todoId);
 
-        if (deleted) {
-            redirectAttributes.addFlashAttribute("successMessage", "Todo deleted successfully!");
-        } else {
+        if (!todoService.deleteTodo(listId, todoId)) {
             redirectAttributes.addFlashAttribute("errorMessage", "Failed to delete todo!");
         }
-
         return "redirect:/lists/" + listId;
     }
 
@@ -207,12 +197,9 @@ public class WebController {
 
         Optional<TodoListResponse> updatedList = todoService.updateTodoList(listId, request);
 
-        if (updatedList.isPresent()) {
-            redirectAttributes.addFlashAttribute("successMessage", "Todo list updated successfully!");
-        } else {
+        if (updatedList.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Failed to update todo list!");
         }
-
         // Redirect to the details page instead of edit page
         return "redirect:/lists/" + listId;
     }
@@ -221,14 +208,9 @@ public class WebController {
     @PostMapping("/lists/{listId}/delete")
     public String deleteTodoList(@PathVariable Long listId,
                                  RedirectAttributes redirectAttributes) {
-        boolean deleted = todoService.deleteTodoList(listId);
-
-        if (deleted) {
-            redirectAttributes.addFlashAttribute("successMessage", "Todo list deleted successfully!");
-        } else {
+        if (!todoService.deleteTodoList(listId)) {
             redirectAttributes.addFlashAttribute("errorMessage", "Failed to delete todo list!");
         }
-
         return "redirect:/";
     }
 
@@ -264,21 +246,15 @@ public class WebController {
                              @RequestParam String description,
                              RedirectAttributes redirectAttributes) {
 
-        // Create request object manually
-        TodoRequest request = new TodoRequest();
-        request.setDescription(description);
-
-        // Validate manually if needed
         if (description == null || description.trim().isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Description cannot be empty!");
             return "redirect:/lists/" + listId;
         }
 
-        Optional<TodoResponse> updateResult = todoService.updateTodo(listId, todoId, request);
+        var request = new TodoRequest();
+        request.setDescription(description);
 
-        if (updateResult.isPresent()) {
-            redirectAttributes.addFlashAttribute("successMessage", "Todo updated successfully!");
-        } else {
+        if (todoService.updateTodo(listId, todoId, request).isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Failed to update todo!");
         }
 
@@ -343,6 +319,117 @@ public class WebController {
         model.addAttribute("todoList", todoListOpt.get());
         model.addAttribute("todo", todoOpt.get());
         return "todos/delete-confirm";
+    }
+
+    // ===================== NOTE OPERATIONS ==================
+
+    @GetMapping("/notes/new")
+    public String newNote(Model model) {
+        model.addAttribute("newNote", new NoteRequest());
+        return "notes/new";
+    }
+
+    @PostMapping("/notes")
+    public String createNote(@Valid @ModelAttribute("newNote") NoteRequest request,
+                             BindingResult bindingResult,
+                             RedirectAttributes redirectAttributes,
+                             Model model) {
+        if (bindingResult.hasErrors()) {
+            var todoLists = todoService.getAllTodoLists();
+            var notes = noteService.getAllNotes();
+            model.addAttribute("todoLists", todoLists);
+            model.addAttribute("notes", notes);
+            model.addAttribute("newTodoList", new TodoListRequest());
+            return "lists";
+        }
+
+        var createdNote = noteService.createNote(request);
+        return "redirect:/notes/" + createdNote.getId();
+    }
+
+    @GetMapping("/notes/{noteId}")
+    public String viewNote(@PathVariable Long noteId,
+                           Model model,
+                           RedirectAttributes redirectAttributes) {
+        return noteService.getNote(noteId)
+                .map(note -> {
+                    model.addAttribute("note", note);
+                    model.addAttribute("editNoteRequest", new NoteRequest());
+                    return "notes/details";
+                })
+                .orElseGet(() -> {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Note not found!");
+                    return "redirect:/";
+                });
+    }
+
+    @GetMapping("/notes/{noteId}/edit")
+    public String editNoteForm(@PathVariable Long noteId,
+                               Model model,
+                               RedirectAttributes redirectAttributes) {
+        return noteService.getNote(noteId)
+                .map(note -> {
+                    NoteRequest editRequest = new NoteRequest();
+                    editRequest.setTitle(note.getTitle());
+                    editRequest.setBody(note.getBody());
+
+                    model.addAttribute("note", note);
+                    model.addAttribute("editNoteRequest", editRequest);
+                    return "notes/edit";
+                })
+                .orElseGet(() -> {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Note not found!");
+                    return "redirect:/";
+                });
+    }
+
+    @PostMapping("/notes/{noteId}/update")
+    public String updateNote(@PathVariable Long noteId,
+                             @Valid @ModelAttribute("editNoteRequest") NoteRequest request,
+                             BindingResult bindingResult,
+                             RedirectAttributes redirectAttributes,
+                             Model model) {
+        if (bindingResult.hasErrors()) {
+            return noteService.getNote(noteId)
+                    .map(note -> {
+                        model.addAttribute("note", note);
+                        return "notes/edit";
+                    })
+                    .orElseGet(() -> {
+                        redirectAttributes.addFlashAttribute("errorMessage", "Note not found!");
+                        return "redirect:/";
+                    });
+        }
+
+        var updatedNote = noteService.updateNote(noteId, request);
+        if (updatedNote.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to update note!");
+        }
+        return "redirect:/notes/" + noteId;
+    }
+
+    @PostMapping("/notes/{noteId}/delete")
+    public String deleteNote(@PathVariable Long noteId,
+                             RedirectAttributes redirectAttributes) {
+        if (!noteService.deleteNote(noteId)) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to delete note!");
+        }
+        return "redirect:/";
+    }
+
+    @GetMapping("/notes/{noteId}/delete-confirm")
+    public String confirmDeleteNote(@PathVariable Long noteId,
+                                    Model model,
+                                    RedirectAttributes redirectAttributes) {
+        return noteService.getNote(noteId)
+                .map(note -> {
+                    model.addAttribute("note", note);
+                    return "notes/delete-confirm";
+                })
+                .orElseGet(() -> {
+                    redirectAttributes.addFlashAttribute("errorMessage", "Note not found!");
+                    return "redirect:/";
+                });
     }
 
 
