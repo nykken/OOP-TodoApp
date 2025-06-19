@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "todos")
 @Data
@@ -23,6 +25,15 @@ public class Todo {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "todo_list_id", nullable = false)
     private TodoList todoList;
+
+    @PrePersist
+    @PreUpdate
+    @PreRemove
+    private void prePersistUpdateRemove() {
+        if (todoList != null) {
+            todoList.setUpdatedAt(LocalDateTime.now());
+        }
+    }
 
     public Todo(String description, TodoList todoList) {
         this.description = description;
