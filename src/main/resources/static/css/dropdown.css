@@ -1,4 +1,4 @@
-.create-dropdown {
+.dropdown-button {
             position: relative;
             display: inline-block;
         }
@@ -26,7 +26,7 @@
             transition: all 0.2s ease-in-out;
         }
 
-        .create-dropdown:hover .dropdown-content {
+        .dropdown-button:hover .dropdown-content {
             opacity: 1;
             visibility: visible;
             transform: translateY(0);

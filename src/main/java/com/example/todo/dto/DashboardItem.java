@@ -11,6 +11,7 @@ public interface DashboardItem {
     String getProgressString();
     String getTitle();
     EntityType getEntityType();
+    String getTimestampString();
 
     // Only relevant for Todo lists
     default int getCompletionPercentage() {

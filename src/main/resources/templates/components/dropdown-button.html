@@ -1,0 +1,19 @@
+<div th:fragment="dropdown-button" class="dropdown-button">
+    <div th:fragment="dropdown-button" class="dropdown-button">
+        <div class="btn btn-primary create-btn">
+            <i class="fas fa-plus"></i>
+            Create New
+            <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="dropdown-content">
+            <a th:href="@{/lists/new}" class="dropdown-item">
+                <i class="fas fa-list"></i>
+                Todo List
+            </a>
+            <a th:href="@{/notes/new}" class="dropdown-item">
+                <i class="fas fa-sticky-note"></i>
+                Note
+            </a>
+        </div>
+    </div>
+</div>

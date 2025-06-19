@@ -41,7 +41,12 @@ public class TodoListResponse implements DashboardItem {
         return (int) Math.round((double) getCompletedTodos() / getTotalTodos() * 100.0);
     }
 
+    public String getTimestampString() {
+        return "bli";
+    }
+
     public String getTitle() {
+
         return name;
     }
 

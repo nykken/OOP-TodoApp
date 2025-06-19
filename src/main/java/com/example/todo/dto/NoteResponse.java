@@ -21,6 +21,10 @@ public class NoteResponse implements DashboardItem {
         return body.length() > 100 ? body.substring(0, 100) + "..." : body;
     }
 
+    public String getTimestampString() {
+        return "bla";
+    }
+
     // Notes do not have progress
     public String getProgressString() {
         return null;
