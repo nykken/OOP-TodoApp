@@ -4,51 +4,105 @@
 <body>
 <nav th:insert="~{layout :: nav}"></nav>
 
-<div class="container main-container">
-    <!-- Header with Back Button -->
-    <div class="header-section">
-        <a th:href="${cancelHref}" class="btn btn-primary">
-            <i class="fas fa-arrow-left"></i>
-            Back
-        </a>
+<div class="container">
+    <div class="main-container">
+        <!-- Header with Back Button -->
+        <div class="header-section">
+            <a th:href="${cancelHref}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i>
+                Back
+            </a>
 
-        <h1 class="header-title" th:text="${title}">Create</h1>
+            <h1 class="header-title" th:text="${title}">Create</h1>
+        </div>
+
+        <!-- Form Container -->
+        <div class="form-container">
+            <form th:action="${formAction}" th:object="${formObject}" method="post" class="create-form">
+                <div th:switch="${entityType}">
+                    <!-- Todo List Form -->
+                    <div th:case="${T(com.example.todo.util.EntityType).TODOLIST}">
+                        <div class="form-group">
+                            <label for="name" class="form-label">
+                                <i class="fas fa-list"></i>
+                                List Name
+                            </label>
+                            <input id="name"
+                                   type="text"
+                                   th:field="*{name}"
+                                   class="form-control form-control-lg"
+                                   required
+                                   autofocus
+                                   placeholder="Enter list name" />
+                        </div>
+                    </div>
+
+                    <!-- Todo Item Form -->
+                    <div th:case="${T(com.example.todo.util.EntityType).TODO}">
+                        <div class="form-group">
+                            <label for="description" class="form-label">
+                                <i class="fas fa-check-circle"></i>
+                                Todo Description
+                            </label>
+                            <input id="description"
+                                   type="text"
+                                   th:field="*{description}"
+                                   class="form-control form-control-lg"
+                                   required
+                                   autofocus
+                                   placeholder="What needs to be done?" />
+                        </div>
+                    </div>
+
+                    <!-- Note Form -->
+                    <div th:case="${T(com.example.todo.util.EntityType).NOTE}">
+                        <div class="form-group">
+                            <label for="title" class="form-label">
+                                <i class="fas fa-sticky-note"></i>
+                                Note Title
+                            </label>
+                            <input id="title"
+                                   type="text"
+                                   th:field="*{title}"
+                                   class="form-control form-control-lg"
+                                   required
+                                   autofocus
+                                   placeholder="Enter note title" />
+                        </div>
+                        <div class="form-group">
+                            <label for="body" class="form-label">
+                                <i class="fas fa-align-left"></i>
+                                Content
+                            </label>
+                            <textarea id="body"
+                                      th:field="*{body}"
+                                      class="form-control form-control-lg"
+                                      rows="8"
+                                      required
+                                      placeholder="Write your note content here..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <a th:href="${cancelHref}" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-times"></i>
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary btn-lg" th:text="${submitLabel}">
+                        <i class="fas fa-save"></i>
+                        Save
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-
-    <!-- Create Form -->
-    <form th:action="${formAction}" th:object="${formObject}" method="post">
-        <div th:switch="${entityType}">
-            <div th:case="${T(com.example.todo.util.EntityType).TODOLIST}">
-                <!-- Now Thymeleaf knows what *{name} refers to -->
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input id="name" type="text" th:field="*{name}" required autofocus placeholder="Enter list name" />
-                </div>
-            </div>
-
-            <div th:case="${T(com.example.todo.util.EntityType).TODO}">
-                <div class="form-group">
-                    <label for="description">Description</label>
-                    <input id="description" type="text" th:field="*{description}" required autofocus placeholder="Enter description" />
-                </div>
-            </div>
-
-            <div th:case="${T(com.example.todo.util.EntityType).NOTE}">
-                <div class="form-group">
-                    <label for="title">Title</label>
-                    <input id="title" type="text" th:field="*{title}" required placeholder="Enter title" />
-                </div>
-                <div class="form-group">
-                    <label for="body">Body</label>
-                    <textarea id="body" th:field="*{body}" rows="6" required placeholder="Enter body"></textarea>
-                </div>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <button type="submit" class="btn btn-success" th:text="${submitLabel}">Submit</button>
-        </div>
-    </form>
 </div>
+
+<style>
+
+</style>
+
 </body>
 </html>
