@@ -1,6 +1,7 @@
 package com.example.todo.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,7 +17,10 @@ public class Todo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+
+
+    @Column(nullable = false, length = 200)
+    @Size(max = 200, message = "Description cannot exceed 200 characters")
     private String description;
 
     @Column(nullable = false)

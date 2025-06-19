@@ -12,4 +12,9 @@ public interface DashboardItem {
     String getTitle();
     EntityType getEntityType();
 
+    // Only relevant for Todo lists
+    default int getCompletionPercentage() {
+        return 0;
+    }
+
 }

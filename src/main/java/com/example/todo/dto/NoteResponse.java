@@ -29,4 +29,5 @@ public class NoteResponse implements DashboardItem {
     public EntityType getEntityType() {
         return EntityType.NOTE;
     }
+
 }

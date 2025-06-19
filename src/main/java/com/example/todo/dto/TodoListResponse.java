@@ -33,6 +33,14 @@ public class TodoListResponse implements DashboardItem {
         return getCompletedTodos() + "/" + getTotalTodos();
     }
 
+    @Override
+    public int getCompletionPercentage() {
+        if (getTotalTodos() == 0) {
+            return 0;
+        }
+        return (int) Math.round((double) getCompletedTodos() / getTotalTodos() * 100.0);
+    }
+
     public String getTitle() {
         return name;
     }

@@ -1,6 +1,7 @@
 package com.example.todo.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -20,7 +21,11 @@ public class Note {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 200)
+    @Size(max = 200, message = "Title cannot exceed 200 characters")
     private String title;
+
+    @Column(columnDefinition = "MEDIUMTEXT")
     private String body;
 
     @CreatedDate

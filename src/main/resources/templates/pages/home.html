@@ -1,6 +1,304 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout :: head}"></head>
+<head th:replace="~{layout :: head}">
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .main-container {
+            padding: 2rem 0;
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .header-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin: 0;
+        }
+
+        .create-dropdown {
+            position: relative;
+        }
+
+        .create-btn {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .dropdown-content {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            min-width: 160px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-top: 0.5rem;
+            z-index: 1000;
+            display: none;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            color: #374151;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background: #f3f4f6;
+        }
+
+        .create-dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #6b7280;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+        }
+
+        .clickable-card {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            padding: 1rem 1.5rem;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .todo-gradient {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        }
+
+        .note-gradient {
+            background: linear-gradient(135deg, #f59e0b, #f97316);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+            flex: 1; /* This makes the card body take up all available space */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0 0 1rem 0;
+        }
+
+        .progress-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 0.75rem;
+            color: #6b7280;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .preview-content {
+            flex: 1; /* This pushes the footer to the bottom by taking up remaining space */
+        }
+
+        .todo-preview-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .todo-preview-item i.completed {
+            color: #10b981;
+        }
+
+        .todo-preview-item i.pending {
+            color: #d1d5db;
+        }
+
+        .todo-preview-item span.completed {
+            color: #6b7280;
+            text-decoration: line-through;
+        }
+
+        .todo-preview-item span {
+            color: #374151;
+            line-height: 1.4;
+        }
+
+        .more-items {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            font-style: italic;
+            margin-top: 0.5rem;
+            padding-left: 1.5rem;
+        }
+
+        .note-preview {
+            color: #6b7280;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            margin: 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-footer {
+            padding: 1rem 1.5rem;
+            background: #f9fafb;
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-timestamp {
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+
+        .btn-outline-danger {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            background: transparent;
+            color: #ef4444;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            text-decoration: none;
+        }
+
+        .btn-outline-danger:hover {
+            background: #fee2e2;
+            color: #dc2626;
+            transform: scale(1.1);
+        }
+
+        .btn-sm {
+            padding: 0.25rem;
+        }
+
+        @media (max-width: 768px) {
+            .cards-container {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .card-header {
+                padding: 1rem;
+            }
+
+            .card-body {
+                padding: 1rem;
+            }
+
+            .card-footer {
+                padding: 1rem;
+            }
+
+            .header-section {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
 <body>
 <!-- Navigation -->
 <nav th:insert="~{layout :: nav}"></nav>
@@ -40,44 +338,66 @@
             <p>Create your first todo list or note to get started!</p>
         </div>
 
-        <!-- Unified Dashboard Items -->
+        <!-- List and Note Cards -->
         <div class="cards-container" th:if="${dashboardItems != null and not #lists.isEmpty(dashboardItems)}">
             <div class="card" th:each="item : ${dashboardItems}">
-                <div class="card-body clickable-card"
+                <div class="clickable-card"
                      role="button"
                      tabindex="0"
                      th:data-url="${item.entityType.name() == 'TODOLIST' ? '/lists/' + item.id : '/notes/' + item.id}"
-                     onclick="window.location.href = this.dataset.url"
-                >
-                    <div class="card-header">
-                        <div class="card-type">
+                     onclick="window.location.href = this.dataset.url">
+
+                    <!-- Card Header -->
+                    <div class="card-header" th:classappend="${item.entityType.name() == 'TODOLIST' ? 'todo-gradient' : 'note-gradient'}">
+                        <div class="header-content">
                             <i th:class="${item.entityType.name() == 'TODOLIST' ? 'fas fa-list' : 'fas fa-sticky-note'}"></i>
-                            <span class="type-label" th:text="${item.entityType.name() == 'TODOLIST' ? 'Todo List' : 'Note'}"></span>
+                            <span th:text="${item.entityType.name() == 'TODOLIST' ? 'Todo List' : 'Note'}"></span>
                         </div>
-                        <h2 class="card-title" th:text="${item.title}"></h2>
                     </div>
 
-                    <!-- Progress badge (only for TodoLists) -->
-                    <div th:if="${item.entityType.name() == 'TODOLIST'}" class="badge">
-                        <span th:text="${item.progressString}"></span>
+                    <!-- Card Body -->
+                    <div class="card-body">
+                        <h3 class="card-title" th:text="${item.title}">Card Title</h3>
+
+                        <!-- Progress Bar (only for TodoLists) -->
+                        <div th:if="${item.entityType.name() == 'TODOLIST'}" class="progress-info">
+                            <div class="progress-bar">
+                                <div class="progress-fill" th:style="'width: ' + ${item.completionPercentage} + '%;'"></div>
+                            </div>
+                            <span class="progress-text" th:text="${item.progressString}">3 of 5 completed</span>
+                        </div>
+
+                        <!-- Preview Content -->
+                        <div class="preview-content">
+                            <!-- Todo List Preview -->
+                            <div th:if="${item.entityType.name() == 'TODOLIST' and item.todos != null and not #lists.isEmpty(item.todos)}">
+                                <div th:each="todo, iterStat : ${item.todos}"
+                                     th:if="${iterStat.index < 3}"
+                                     class="todo-preview-item">
+                                    <i th:class="${todo.completed ? 'fas fa-check-circle completed' : 'far fa-circle pending'}"></i>
+                                    <span th:text="${todo.description}"
+                                          th:classappend="${todo.completed ? 'completed' : ''}">Todo item</span>
+                                </div>
+                                <div th:if="${#lists.size(item.todos) > 3}" class="more-items">
+                                    <span th:text="'+' + ${#lists.size(item.todos) - 3} + ' more items'"></span>
+                                </div>
+                            </div>
+
+                            <!-- Note Preview -->
+                            <div th:if="${item.entityType.name() == 'NOTE'}">
+                                <p class="note-preview" th:text="${item.preview}">Note preview content...</p>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Preview text -->
-                    <p class="note-preview" th:text="${item.preview}"></p>
-
-                    <div class="card-timestamp">
-                        <span th:text="${@timeUtil.lastEdited(item.updatedAt)}">Last edited</span>
+                    <!-- Footer -->
+                    <div class="card-footer">
+                        <span class="footer-timestamp" th:text="'Last edited ' + ${@timeUtil.lastEdited(item.updatedAt)}"></span>
+                        <a th:href="${item.entityType.name() == 'TODOLIST' ? '/lists/' + item.id + '/delete-confirm' : '/notes/' + item.id + '/delete-confirm'}"
+                           class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-trash"></i>
+                        </a>
                     </div>
-                </div>
-
-                <!-- Card Footer with Actions -->
-                <div class="card-footer">
-                    <!-- Conditional delete URL based on item type -->
-                    <a th:href="${item.entityType.name() == 'TODOLIST' ? '/lists/' + item.id + '/delete-confirm' : '/notes/' + item.id + '/delete-confirm'}"
-                       class="btn btn-outline-danger btn-sm">
-                        <i class="fas fa-trash"></i>
-                        Delete
-                    </a>
                 </div>
             </div>
         </div>
@@ -85,5 +405,9 @@
 </div>
 
 <div th:insert="~{layout :: fab}"></div>
+
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
 </body>
 </html>

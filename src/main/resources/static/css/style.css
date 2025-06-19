@@ -82,8 +82,6 @@ color: #5855eb;
 /* Main Container */
 .main-container {
 background-color: white;
-margin: 1rem auto;
-padding: 1rem;
 border-radius: 16px;
 box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
 margin: 2rem auto;
@@ -244,78 +242,6 @@ margin-bottom: 0.5rem;
 
 .empty-state p {
 color: #9ca3af;
-}
-
-/* Todo List Cards */
-.cards-container {
-display: flex;
-flex-wrap: wrap;
-gap: 1.5rem;
-justify-content: center;
-}
-
-.card {
-/* Display & Layout */
-display: flex;
-flex-direction: column;
-flex: 1 1 320px;
-min-width: 280px;
-max-width: 400px;
-
-/* Appearance */
-background: white;
-border: 1px solid #e2e8f0;
-border-radius: 12px;
-box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-
-/* Interaction */
-cursor: pointer;
-transition: all 0.2s ease;
-}
-
-.card:hover {
-transform: translateY(-2px);
-box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-}
-
-.card-body {
-padding: 1.5rem;
-flex-grow: 1;
-}
-
-.card-title {
-font-size: 1.25rem;
-font-weight: 600;
-margin-bottom: 1rem;
-color: #1e293b;
-}
-
-.card-footer {
-padding: 1rem 1.5rem;
-border-top: 1px solid #f1f5f9;
-background: #f8fafc;
-border-radius: 0 0 12px 12px;
-display: flex;
-justify-content: flex-end;
-gap: 0.5rem;
-}
-
-.card-header {
-display: flex;
-justify-content: space-between;
-align-items: flex-start;
-margin-bottom: 1rem;
-}
-
-.badge {
-display: inline-block;
-padding: 0.25rem 0.75rem;
-background: #6b7280;
-color: white;
-border-radius: 6px;
-font-size: 0.75rem;
-font-weight: 500;
-margin-bottom: 1rem;
 }
 
 /* Todo List */
