@@ -9,9 +9,7 @@ import com.example.todo.entities.TodoList;
 import com.example.todo.repositories.TodoListRepository;
 import com.example.todo.repositories.TodoRepository;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

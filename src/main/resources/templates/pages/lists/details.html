@@ -10,7 +10,7 @@
 
     <!-- Header Section -->
     <div class="header-section">
-      <a th:href="@{/static}" class="btn btn-primary">
+      <a th:href="@{/}" class="btn btn-primary">
         <i class="fas fa-arrow-left"></i>
         Back
       </a>
@@ -18,11 +18,11 @@
         <h1 class="header-title" th:text="${todoList != null ? todoList.name : 'Todo List'}">
           Todo List Name
         </h1>
-        <a th:href="@{lists/{id}/edit(id=${todoList.id})}" class="edit-btn">
+        <a th:href="@{/lists/{id}/edit(id=${todoList.id})}" class="edit-btn">
           <i class="fas fa-edit"></i>
         </a>
       </div>
-      <a th:href="@{lists/{id}/todos/new(id=${todoList.id})}" class="btn btn-primary">
+      <a th:href="@{/lists/{id}/todos/new(id=${todoList.id})}" class="btn btn-primary">
         <i class="fas fa-plus"></i>
         Add Todo
       </a>
@@ -30,17 +30,17 @@
 
     <!-- Filter Buttons -->
     <div class="filter-section">
-      <a th:href="@{lists/{id}(id=${todoList.id})}"
+      <a th:href="@{/lists/{id}(id=${todoList.id})}"
          class="btn btn-outline-secondary btn-sm"
          th:classappend="${currentFilter == null ? 'active' : ''}">
         All
       </a>
-      <a th:href="@{lists/{id}(id=${todoList.id}, filter='pending')}"
+      <a th:href="@{/lists/{id}(id=${todoList.id}, filter='pending')}"
          class="btn btn-outline-warning btn-sm"
          th:classappend="${currentFilter == 'pending' ? 'active' : ''}">
         Pending
       </a>
-      <a th:href="@{lists/{id}(id=${todoList.id}, filter='completed')}"
+      <a th:href="@{/lists/{id}(id=${todoList.id}, filter='completed')}"
          class="btn btn-outline-success btn-sm"
          th:classappend="${currentFilter == 'completed' ? 'active' : ''}">
         Completed
@@ -71,7 +71,7 @@
     <div class="todo-list" th:if="${todos != null and not #lists.isEmpty(todos)}">
       <div class="todo-item" th:each="todo : ${todos}" th:if="${todo != null}">
         <div class="todo-content">
-          <form th:action="@{lists/{listId}/todos/{todoId}/toggle(listId=${todoList.id}, todoId=${todo.id})}"
+          <form th:action="@{/lists/{listId}/todos/{todoId}/toggle(listId=${todoList.id}, todoId=${todo.id})}"
                 method="post" class="todo-toggle">
             <button type="submit" class="btn btn-link">
               <i class="fas fa-check-circle text-success" th:if="${todo.completed}"></i>
@@ -85,11 +85,11 @@
           </span>
         </div>
         <div class="todo-actions">
-          <a th:href="@{lists/{listId}/todos/{todoId}/edit(listId=${todoList.id}, todoId=${todo.id})}"
+          <a th:href="@{/lists/{listId}/todos/{todoId}/edit(listId=${todoList.id}, todoId=${todo.id})}"
              class="btn btn-sm btn-outline-primary">
             <i class="fas fa-edit"></i>
           </a>
-          <a th:href="@{lists/{listId}/todos/{todoId}/delete-confirm(listId=${todoList.id}, todoId=${todo.id})}"
+          <a th:href="@{/lists/{listId}/todos/{todoId}/delete-confirm(listId=${todoList.id}, todoId=${todo.id})}"
              class="btn btn-outline-danger btn-sm">
             <i class="fas fa-trash"></i>
           </a>

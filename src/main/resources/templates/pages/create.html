@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:insert="~{layout :: head}"></head>
+<body>
+<nav th:insert="~{layout :: nav}"></nav>
+
+<div class="container main-container">
+    <!-- Header with Back Button -->
+    <div class="header-section">
+        <a th:href="${cancelHref}" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i>
+            Back
+        </a>
+
+        <h1 class="header-title" th:text="${title}">Create</h1>
+    </div>
+
+    <!-- Create Form -->
+    <form th:action="${formAction}" th:object="${formObject}" method="post">
+        <div th:switch="${entityType}">
+            <div th:case="${T(com.example.todo.util.EntityType).TODOLIST}">
+                <!-- Now Thymeleaf knows what *{name} refers to -->
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input id="name" type="text" th:field="*{name}" required autofocus placeholder="Enter list name" />
+                </div>
+            </div>
+
+            <div th:case="${T(com.example.todo.util.EntityType).TODO}">
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <input id="description" type="text" th:field="*{description}" required autofocus placeholder="Enter description" />
+                </div>
+            </div>
+
+            <div th:case="${T(com.example.todo.util.EntityType).NOTE}">
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input id="title" type="text" th:field="*{title}" required placeholder="Enter title" />
+                </div>
+                <div class="form-group">
+                    <label for="body">Body</label>
+                    <textarea id="body" th:field="*{body}" rows="6" required placeholder="Enter body"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-success" th:text="${submitLabel}">Submit</button>
+        </div>
+    </form>
+</div>
+</body>
+</html>

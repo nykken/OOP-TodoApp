@@ -7,7 +7,7 @@
 <div class="container">
   <div class="main-container">
     <div class="header-section">
-      <a th:href="@{/templates/pages/lists/{id}(id=${todoList.id})}" class="btn btn-primary">
+      <a th:href="@{/pages/lists/{id}(id=${todoList.id})}" class="btn btn-primary">
         <i class="fas fa-arrow-left"></i>
         Back
       </a>
@@ -16,7 +16,7 @@
       </h1>
     </div>
 
-    <form th:action="@{/templates/pages/lists/{listId}/todos/{todoId}/update(listId=${todoList.id}, todoId=${todo.id})}"
+    <form th:action="@{/lists/{listId}/todos/{todoId}/update(listId=${todoList.id}, todoId=${todo.id})}"
           th:object="${todo}" method="post">
       <div class="form-group">
         <label for="editTodoDescription" class="form-label">Description</label>
@@ -28,7 +28,7 @@
                required>
       </div>
       <div class="form-actions" style="margin-top: 1rem; display: flex; gap: 1rem;">
-        <a th:href="@{/templates/pages/lists/{id}(id=${todoList.id})}" class="btn btn-secondary">Cancel</a>
+        <a th:href="@{/lists/{id}(id=${todoList.id})}" class="btn btn-secondary">Cancel</a>
         <button type="submit" class="btn btn-primary">
           <i class="fas fa-save"></i>
           Save Changes

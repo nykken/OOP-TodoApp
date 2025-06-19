@@ -5,7 +5,6 @@ import com.example.todo.dto.NoteResponse;
 import com.example.todo.entities.Note;
 import com.example.todo.repositories.NoteRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

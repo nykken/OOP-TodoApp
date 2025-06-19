@@ -3,6 +3,7 @@ package com.example.todo.controller;
 import com.example.todo.dto.*;
 import com.example.todo.services.NoteService;
 import com.example.todo.services.TodoService;
+import com.example.todo.util.EntityType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,7 +13,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -40,7 +40,7 @@ public class WebController {
         model.addAttribute("dashboardItems", dashboardItems);
         model.addAttribute("newTodoList", new TodoListRequest());
         model.addAttribute("newNote", new NoteRequest());
-        return "pages/lists";
+        return "/pages/home";
     }
 
 
@@ -55,12 +55,112 @@ public class WebController {
 
 
 
-    // ===================== LIST OPERATIONS ==================
+    // ===================== CREATE NEW ==================
     @GetMapping("/lists/new")
     public String newTodoList(Model model) {
-        model.addAttribute("newTodoList", new TodoListRequest());
-        return "/pages/lists/new";
+        model.addAttribute("entityType", EntityType.TODOLIST);
+        model.addAttribute("formObject", new TodoListRequest());
+        model.addAttribute("formAction", "/lists");
+        model.addAttribute("title", "Create New Todo List");
+        model.addAttribute("submitLabel", "Create List");
+        model.addAttribute("cancelHref", "/");
+        return "pages/create";
     }
+
+    @GetMapping("/lists/{listId}/todos/new")
+    public String newTodo(Model model, @PathVariable Long listId) {
+        model.addAttribute("entityType", EntityType.TODO);
+        model.addAttribute("formObject", new TodoRequest());
+        model.addAttribute("formAction", "/lists/" + listId + "/todos");
+        model.addAttribute("title", "Create New Todo");
+        model.addAttribute("submitLabel", "Create Todo");
+        model.addAttribute("cancelHref", "/");
+        return "pages/create";
+    }
+
+    @GetMapping("/notes/new")
+    public String newNote(Model model) {
+        model.addAttribute("entityType", EntityType.NOTE);
+        model.addAttribute("formObject", new NoteRequest());
+        model.addAttribute("formAction", "/notes");
+        model.addAttribute("title", "Create New Note");
+        model.addAttribute("submitLabel", "Create Note");
+        model.addAttribute("cancelHref", "/");
+        return "pages/create";
+    }
+
+
+    // ========= EDIT ===========
+    @GetMapping("/lists/{id}/edit")
+    public String editTodoList(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+        Optional<TodoListResponse> existingListOpt = todoService.getTodoList(id);
+
+        if (existingListOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Todo list not found!");
+            return "redirect:/";
+        }
+
+        TodoListResponse existingList = existingListOpt.get();
+        TodoListRequest form = new TodoListRequest();
+        form.setName(existingList.getName());
+
+        model.addAttribute("entityType", EntityType.TODOLIST);
+        model.addAttribute("formObject", form);
+        model.addAttribute("formAction", "/lists/" + id + "/update"); // Note: changed to /update
+        model.addAttribute("title", "Edit Todo List");
+        model.addAttribute("submitLabel", "Save Changes");
+        model.addAttribute("cancelHref", "/lists/" + id);
+        return "pages/create";
+    }
+
+    @GetMapping("/lists/{listId}/todos/{todoId}/edit")
+    public String editTodo(@PathVariable Long listId,
+                               @PathVariable Long todoId,
+                               Model model,
+                               RedirectAttributes redirectAttributes) {
+        Optional<TodoResponse> todoOpt = todoService.getTodo(listId, todoId);
+        Optional<TodoListResponse> todoListOpt = todoService.getTodoList(listId);
+
+        if (todoOpt.isEmpty() || todoListOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Todo or list not found!");
+            return "redirect:/lists/" + listId;
+        }
+
+        TodoResponse todo = todoOpt.get();
+        TodoRequest form = new TodoRequest();
+        form.setDescription(todo.getDescription());
+
+        model.addAttribute("entityType", EntityType.TODO);
+        model.addAttribute("formObject", form);
+        model.addAttribute("formAction", "/lists/" + listId + "/todos/" + todoId + "/update");
+        model.addAttribute("title", "Edit Todo");
+        model.addAttribute("submitLabel", "Save Changes");
+        model.addAttribute("cancelHref", "/lists/" + listId);
+        return "pages/create";
+    }
+
+    @GetMapping("/notes/{id}/edit")
+    public String editNote(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+        Optional<NoteResponse> existingNoteOpt = noteService.getNote(id);
+
+        if (existingNoteOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Note not found!");
+            return "redirect:/";
+        }
+
+        NoteResponse existingNote = existingNoteOpt.get();
+        NoteRequest form = new NoteRequest();
+        form.setBody(existingNote.getBody());
+
+        model.addAttribute("entityType", EntityType.NOTE);
+        model.addAttribute("formObject", form);
+        model.addAttribute("formAction", "/notes/" + id + "/update");
+        model.addAttribute("title", "Edit Note");
+        model.addAttribute("submitLabel", "Save Changes");
+        model.addAttribute("cancelHref", "/notes/" + id);
+        return "pages/create";
+    }
+
 
     @PostMapping("/lists")
     public String createTodoList(@Valid @ModelAttribute("newTodoList") TodoListRequest request,
@@ -70,7 +170,7 @@ public class WebController {
         if (bindingResult.hasErrors()) {
             List<TodoListResponse> todoLists = todoService.getAllTodoLists();
             model.addAttribute("todoLists", todoLists);
-            return "pages/lists";
+            return "pages/home";
         }
 
         TodoListResponse createdList = todoService.createTodoList(request);
@@ -217,30 +317,31 @@ public class WebController {
         return "redirect:/";
     }
 
+
     // Edit todo
-    @GetMapping("lists/{listId}/todos/{todoId}/edit")
-    public String editTodoForm(@PathVariable Long listId,
-                               @PathVariable Long todoId,
-                               Model model,
-                               RedirectAttributes redirectAttributes) {
-        Optional<TodoResponse> todoOpt = todoService.getTodo(listId, todoId);
-        Optional<TodoListResponse> todoListOpt = todoService.getTodoList(listId);
-
-        if (todoOpt.isEmpty() || todoListOpt.isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Todo or list not found!");
-            return "redirect:/lists/" + listId;
-        }
-
-        TodoResponse todo = todoOpt.get();
-        TodoRequest editRequest = new TodoRequest();
-        editRequest.setDescription(todo.getDescription());
-
-        model.addAttribute("todoList", todoListOpt.get());
-        model.addAttribute("todo", todo);
-        model.addAttribute("editTodoRequest", editRequest);
-
-        return "pages/todos/edit";
-    }
+//    @GetMapping("lists/{listId}/todos/{todoId}/edit")
+//    public String editTodoForm(@PathVariable Long listId,
+//                               @PathVariable Long todoId,
+//                               Model model,
+//                               RedirectAttributes redirectAttributes) {
+//        Optional<TodoResponse> todoOpt = todoService.getTodo(listId, todoId);
+//        Optional<TodoListResponse> todoListOpt = todoService.getTodoList(listId);
+//
+//        if (todoOpt.isEmpty() || todoListOpt.isEmpty()) {
+//            redirectAttributes.addFlashAttribute("errorMessage", "Todo or list not found!");
+//            return "redirect:/lists/" + listId;
+//        }
+//
+//        TodoResponse todo = todoOpt.get();
+//        TodoRequest editRequest = new TodoRequest();
+//        editRequest.setDescription(todo.getDescription());
+//
+//        model.addAttribute("todoList", todoListOpt.get());
+//        model.addAttribute("todo", todo);
+//        model.addAttribute("editTodoRequest", editRequest);
+//
+//        return "pages/todos/edit";
+//    }
 
     // Update todo
     @PostMapping("lists/{listId}/todos/{todoId}/update")
@@ -264,22 +365,22 @@ public class WebController {
         return "redirect:/lists/" + listId;
     }
 
-    @GetMapping("/lists/{id}/edit")
-    public String editTodoList(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
-        Optional<TodoListResponse> todoListOpt = todoService.getTodoList(id);
-        if (todoListOpt.isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Todo list not found!");
-            return "redirect:/";
-        }
-
-        TodoListResponse todoList = todoListOpt.get();
-        TodoListRequest editRequest = new TodoListRequest();
-        editRequest.setName(todoList.getName());
-
-        model.addAttribute("todoList", todoList);
-        model.addAttribute("editTodoListRequest", editRequest);
-        return "pages/lists/edit";
-    }
+//    @GetMapping("/lists/{id}/edit")
+//    public String editTodoList(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+//        Optional<TodoListResponse> todoListOpt = todoService.getTodoList(id);
+//        if (todoListOpt.isEmpty()) {
+//            redirectAttributes.addFlashAttribute("errorMessage", "Todo list not found!");
+//            return "redirect:/";
+//        }
+//
+//        TodoListResponse todoList = todoListOpt.get();
+//        TodoListRequest editRequest = new TodoListRequest();
+//        editRequest.setName(todoList.getName());
+//
+//        model.addAttribute("todoList", todoList);
+//        model.addAttribute("editTodoListRequest", editRequest);
+//        return "pages/lists/edit";
+//    }
 
     @GetMapping("/lists/{id}/delete-confirm")
     public String confirmDeleteTodoList(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
@@ -295,18 +396,18 @@ public class WebController {
 
     // ---- NEW TODO MANAGEMENT PAGES ----
 
-    @GetMapping("/lists/{listId}/todos/new")
-    public String newTodo(@PathVariable Long listId, Model model, RedirectAttributes redirectAttributes) {
-        Optional<TodoListResponse> todoListOpt = todoService.getTodoList(listId);
-        if (todoListOpt.isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Todo list not found!");
-            return "redirect:/";
-        }
-
-        model.addAttribute("todoList", todoListOpt.get());
-        model.addAttribute("newTodo", new TodoRequest());
-        return "pages/todos/new";
-    }
+//    @GetMapping("/lists/{listId}/todos/new")
+//    public String newTodo(@PathVariable Long listId, Model model, RedirectAttributes redirectAttributes) {
+//        Optional<TodoListResponse> todoListOpt = todoService.getTodoList(listId);
+//        if (todoListOpt.isEmpty()) {
+//            redirectAttributes.addFlashAttribute("errorMessage", "Todo list not found!");
+//            return "redirect:/";
+//        }
+//
+//        model.addAttribute("todoList", todoListOpt.get());
+//        model.addAttribute("newTodo", new TodoRequest());
+//        return "pages/todos/new";
+//    }
 
     @GetMapping("/lists/{listId}/todos/{todoId}/delete-confirm")
     public String confirmDeleteTodo(@PathVariable Long listId, @PathVariable Long todoId,
@@ -326,11 +427,11 @@ public class WebController {
 
     // ===================== NOTE OPERATIONS ==================
 
-    @GetMapping("/notes/new")
-    public String newNote(Model model) {
-        model.addAttribute("newNote", new NoteRequest());
-        return "pages/notes/new";
-    }
+//    @GetMapping("/notes/new")
+//    public String newNote(Model model) {
+//        model.addAttribute("newNote", new NoteRequest());
+//        return "pages/notes/new";
+//    }
 
     @PostMapping("/notes")
     public String createNote(@Valid @ModelAttribute("newNote") NoteRequest request,
@@ -343,7 +444,7 @@ public class WebController {
             model.addAttribute("todoLists", todoLists);
             model.addAttribute("notes", notes);
             model.addAttribute("newTodoList", new TodoListRequest());
-            return "pages/lists";
+            return "home";
         }
 
         var createdNote = noteService.createNote(request);
@@ -366,25 +467,25 @@ public class WebController {
                 });
     }
 
-    @GetMapping("/notes/{noteId}/edit")
-    public String editNoteForm(@PathVariable Long noteId,
-                               Model model,
-                               RedirectAttributes redirectAttributes) {
-        return noteService.getNote(noteId)
-                .map(note -> {
-                    NoteRequest editRequest = new NoteRequest();
-                    editRequest.setTitle(note.getTitle());
-                    editRequest.setBody(note.getBody());
-
-                    model.addAttribute("note", note);
-                    model.addAttribute("editNoteRequest", editRequest);
-                    return "notes/edit";
-                })
-                .orElseGet(() -> {
-                    redirectAttributes.addFlashAttribute("errorMessage", "Note not found!");
-                    return "redirect:/";
-                });
-    }
+//    @GetMapping("/notes/{noteId}/edit")
+//    public String editNoteForm(@PathVariable Long noteId,
+//                               Model model,
+//                               RedirectAttributes redirectAttributes) {
+//        return noteService.getNote(noteId)
+//                .map(note -> {
+//                    NoteRequest editRequest = new NoteRequest();
+//                    editRequest.setTitle(note.getTitle());
+//                    editRequest.setBody(note.getBody());
+//
+//                    model.addAttribute("note", note);
+//                    model.addAttribute("editNoteRequest", editRequest);
+//                    return "notes/edit";
+//                })
+//                .orElseGet(() -> {
+//                    redirectAttributes.addFlashAttribute("errorMessage", "Note not found!");
+//                    return "redirect:/";
+//                });
+//    }
 
     @PostMapping("/notes/{noteId}/update")
     public String updateNote(@PathVariable Long noteId,
