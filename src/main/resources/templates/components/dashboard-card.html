@@ -30,20 +30,20 @@
                 <!-- Todo List Preview -->
                 <div th:if="${item.entityType.name() == 'TODOLIST' and item.todos != null and not #lists.isEmpty(item.todos)}">
                     <div th:each="todo, iterStat : ${item.todos}"
-                         th:if="${iterStat.index < 3}"
+                         th:if="${iterStat.index < 2}"
                          class="todo-preview-item">
                         <i th:class="${todo.completed ? 'fas fa-check-circle completed' : 'far fa-circle pending'}"></i>
                         <span th:text="${todo.description}"
                               th:classappend="${todo.completed ? 'completed' : ''}">Todo item</span>
                     </div>
-                    <div th:if="${#lists.size(item.todos) > 3}" class="more-items">
-                        <span th:text="'+' + ${#lists.size(item.todos) - 3} + ' more items'"></span>
+                    <div th:if="${#lists.size(item.todos) > 2}" class="more-items">
+                        <span th:text="'+' + ${#lists.size(item.todos) - 2} + ' more items'"></span>
                     </div>
                 </div>
 
                 <!-- Note Preview -->
                 <div th:if="${item.entityType.name() == 'NOTE'}">
-                    <p class="note-preview" th:text="${item.preview}">Note preview content...</p>
+                    <p class="note-preview" th:text="${item.preview}"></p>
                 </div>
             </div>
         </div>

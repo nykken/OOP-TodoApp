@@ -23,8 +23,8 @@
         </div>
 
         <!-- Dashboard Cards -->
-        <div th:if="${dashboardItems != null and not #lists.isEmpty(dashboardItems)}">
-            <div class="cards-container" th:each="item : ${dashboardItems}">
+        <div class="cards-container" th:if="${dashboardItems != null and not #lists.isEmpty(dashboardItems)}">
+            <div class th:each="item : ${dashboardItems}">
                 <div th:replace="~{components/dashboard-card :: dashboard-card(item=${item})}"></div>
             </div>
         </div>
