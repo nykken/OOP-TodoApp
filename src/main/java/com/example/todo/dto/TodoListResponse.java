@@ -1,5 +1,6 @@
 package com.example.todo.dto;
 
+import com.example.todo.util.EntityType;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -38,5 +39,9 @@ public class TodoListResponse implements DashboardItem {
 
     public String getPreview() {
         return "this is a todolist preview tralala";
+    }
+
+    public EntityType getEntityType() {
+        return EntityType.TODOLIST;
     }
 }

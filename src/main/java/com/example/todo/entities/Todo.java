@@ -30,6 +30,7 @@ public class Todo {
     @PreUpdate
     @PreRemove
     private void prePersistUpdateRemove() {
+        System.out.println("Todo callback fired for: " + this.description);
         if (todoList != null) {
             todoList.setUpdatedAt(LocalDateTime.now());
         }

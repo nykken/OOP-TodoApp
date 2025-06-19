@@ -107,6 +107,7 @@ public class TodoService {
         return false;
     }
 
+
     public Optional<TodoResponse> markTodoAsComplete(Long listId, Long todoId) {
         return setTodoCompletionStatus(listId, todoId, true);
     }
@@ -121,6 +122,8 @@ public class TodoService {
                 .map(todo -> {
                     todo.setCompleted(completed);
                     Todo updatedTodo = todoRepository.save(todo);
+                    // Explicitly save the parent to persist the updated timestamp
+                    todoListRepository.save(todo.getTodoList());
                     return ConversionUtils.convertTodoToResponse(updatedTodo);
                 });
     }

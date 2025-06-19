@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:insert="~{layout :: head}"></head>
+<head th:replace="~{layout :: head}"></head>
 <body>
 <!-- Navigation -->
 <nav th:insert="~{layout :: nav}"></nav>
@@ -33,19 +33,19 @@
                 <div class="card-body clickable-card"
                      role="button"
                      tabindex="0"
-                     th:data-url="${item.progressString != null ? '/lists/' + item.id : '/notes/' + item.id}"
+                     th:data-url="${item.entityType.name() == 'TODOLIST' ? '/lists/' + item.id : '/notes/' + item.id}"
                      onclick="window.location.href = this.dataset.url"
                 >
                     <div class="card-header">
                         <div class="card-type">
-                            <i th:class="${item.progressString != null ? 'fas fa-list' : 'fas fa-sticky-note'}"></i>
-                            <span class="type-label" th:text="${item.progressString != null ? 'Todo List' : 'Note'}"></span>
+                            <i th:class="${item.entityType.name() == 'TODOLIST' ? 'fas fa-list' : 'fas fa-sticky-note'}"></i>
+                            <span class="type-label" th:text="${item.entityType.name() == 'TODOLIST' ? 'Todo List' : 'Note'}"></span>
                         </div>
                         <h2 class="card-title" th:text="${item.title}"></h2>
                     </div>
 
                     <!-- Progress badge (only for TodoLists) -->
-                    <div th:if="${item.progressString != null}" class="badge">
+                    <div th:if="${item.entityType.name() == 'TODOLIST'}" class="badge">
                         <span th:text="${item.progressString}"></span>
                     </div>
 
@@ -60,7 +60,7 @@
                 <!-- Card Footer with Actions -->
                 <div class="card-footer">
                     <!-- Conditional delete URL based on item type -->
-                    <a th:href="${item.progressString != null ? '/lists/' + item.id + '/delete-confirm' : '/notes/' + item.id + '/delete-confirm'}"
+                    <a th:href="${item.entityType.name() == 'TODOLIST' ? '/lists/' + item.id + '/delete-confirm' : '/notes/' + item.id + '/delete-confirm'}"
                        class="btn btn-outline-danger btn-sm">
                         <i class="fas fa-trash"></i>
                         Delete
