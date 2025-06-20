@@ -13,18 +13,6 @@ public class NoteResponse implements DashboardItem {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // Add this helper method here
-    public String getPreview() {
-        if (body == null || body.trim().isEmpty()) {
-            return "No content yet.";
-        }
-        return body.length() > 100 ? body.substring(0, 100) + "..." : body;
-    }
-
-    public String getTimestampString() {
-        return "bla";
-    }
-
     // Notes do not have progress
     public String getProgressString() {
         return null;

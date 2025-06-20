@@ -46,7 +46,7 @@ public class WebController {
     }
 
 
-    // ========= CREATE/EDIT PAGE ===========
+    // =====================CREATE/EDIT PAGE =====================
 
     @GetMapping("/lists/new")
     public String newTodoList(Model model) {
@@ -56,7 +56,7 @@ public class WebController {
         model.addAttribute("title", "Create New Todo List");
         model.addAttribute("submitLabel", "Create List");
         model.addAttribute("cancelHref", "/");
-        return "pages/create";
+        return "/pages/create";
     }
 
     @GetMapping("/lists/{listId}/todos/new")
@@ -67,7 +67,7 @@ public class WebController {
         model.addAttribute("title", "Create New Todo");
         model.addAttribute("submitLabel", "Create Todo");
         model.addAttribute("cancelHref", "/");
-        return "pages/create";
+        return "/pages/create";
     }
 
     @GetMapping("/notes/new")
@@ -78,7 +78,7 @@ public class WebController {
         model.addAttribute("title", "Create New Note");
         model.addAttribute("submitLabel", "Create Note");
         model.addAttribute("cancelHref", "/");
-        return "pages/create";
+        return "/pages/create";
     }
 
     @GetMapping("/lists/{id}/edit")
@@ -100,7 +100,7 @@ public class WebController {
         model.addAttribute("title", "Rename Todo List");
         model.addAttribute("submitLabel", "Save Changes");
         model.addAttribute("cancelHref", "/lists/" + id);
-        return "pages/create";
+        return "/pages/create";
     }
 
     @GetMapping("/lists/{listId}/todos/{todoId}/edit")
@@ -126,7 +126,7 @@ public class WebController {
         model.addAttribute("title", "Edit Todo");
         model.addAttribute("submitLabel", "Save Changes");
         model.addAttribute("cancelHref", "/lists/" + listId);
-        return "pages/create";
+        return "/pages/create";
     }
 
     @GetMapping("/notes/{id}/edit")
@@ -149,10 +149,10 @@ public class WebController {
         model.addAttribute("title", "Edit Note");
         model.addAttribute("submitLabel", "Save Changes");
         model.addAttribute("cancelHref", "/notes/" + id);
-        return "pages/create";
+        return "/pages/create";
     }
 
-    // ========= CREATE OPERATIONS ===========
+    // ===================== CREATE OPERATIONS =====================
 
     @PostMapping("/lists")
     public String createTodoList(@Valid @ModelAttribute("newTodoList") TodoListRequest request,
@@ -162,14 +162,14 @@ public class WebController {
         if (bindingResult.hasErrors()) {
             List<TodoListResponse> todoLists = todoService.getAllTodoLists();
             model.addAttribute("todoLists", todoLists);
-            return "pages/home";
+            return "/pages/home";
         }
 
         TodoListResponse createdList = todoService.createTodoList(request);
         return "redirect:lists/" + createdList.getId();
     }
 
-    @PostMapping("lists/{listId}/todos")
+    @PostMapping("/lists/{listId}/todos")
     public String createTodo(@PathVariable Long listId,
                              @Valid @ModelAttribute("newTodo") TodoRequest request,
                              BindingResult bindingResult,
@@ -204,22 +204,22 @@ public class WebController {
                              RedirectAttributes redirectAttributes,
                              Model model) {
         if (bindingResult.hasErrors()) {
-            var todoLists = todoService.getAllTodoLists();
-            var notes = noteService.getAllNotes();
+            List<TodoListResponse> todoLists = todoService.getAllTodoLists();
+            List<NoteResponse> notes = noteService.getAllNotes();
             model.addAttribute("todoLists", todoLists);
             model.addAttribute("notes", notes);
             model.addAttribute("newTodoList", new TodoListRequest());
-            return "home";
+            return "/pages/home";
         }
 
-        var createdNote = noteService.createNote(request);
+        NoteResponse createdNote = noteService.createNote(request);
         return "redirect:/notes/" + createdNote.getId();
     }
 
-    // ========= UPDATE OPERATIONS ===========
+    // ===================== UPDATE OPERATIONS =====================
 
     // Rename todo list
-    @PostMapping("lists/{listId}/update")
+    @PostMapping("/lists/{listId}/update")
     public String updateTodoList(@PathVariable Long listId,
                                  @Valid @ModelAttribute("editTodoListRequest") TodoListRequest request,
                                  BindingResult bindingResult,
@@ -233,7 +233,7 @@ public class WebController {
             }
 
             model.addAttribute("todoList", todoListOpt.get());
-            return "pages/lists/edit";
+            return "/pages/create";
         }
 
         Optional<TodoListResponse> updatedList = todoService.updateTodoList(listId, request);
@@ -245,7 +245,7 @@ public class WebController {
     }
 
     // Edit todo description
-    @PostMapping("lists/{listId}/todos/{todoId}/update")
+    @PostMapping("/lists/{listId}/todos/{todoId}/update")
     public String updateTodo(@PathVariable Long listId,
                              @PathVariable Long todoId,
                              @RequestParam String description,
@@ -256,7 +256,7 @@ public class WebController {
             return "redirect:/lists/" + listId;
         }
 
-        var request = new TodoRequest();
+        TodoRequest request = new TodoRequest();
         request.setDescription(description);
 
         if (todoService.updateTodo(listId, todoId, request).isEmpty()) {
@@ -267,14 +267,14 @@ public class WebController {
     }
 
     // Toggle todo completion status
-    @PostMapping("lists/{listId}/todos/{todoId}/toggle")
+    @PostMapping("/lists/{listId}/todos/{todoId}/toggle")
     public String toggleTodoCompletion(@PathVariable Long listId,
                                        @PathVariable Long todoId,
                                        RedirectAttributes redirectAttributes) {
 
         return todoService.getTodo(listId, todoId)
                 .map(todo -> {
-                    var result = todo.isCompleted()
+                    Optional<TodoResponse> result = todo.isCompleted()
                             ? todoService.markTodoAsIncomplete(listId, todoId)
                             : todoService.markTodoAsComplete(listId, todoId);
 
@@ -299,7 +299,7 @@ public class WebController {
             return noteService.getNote(noteId)
                     .map(note -> {
                         model.addAttribute("note", note);
-                        return "notes/edit";
+                        return "/pages/create";
                     })
                     .orElseGet(() -> {
                         redirectAttributes.addFlashAttribute("errorMessage", "Note not found!");
@@ -307,16 +307,16 @@ public class WebController {
                     });
         }
 
-        var updatedNote = noteService.updateNote(noteId, request);
+        Optional<NoteResponse> updatedNote = noteService.updateNote(noteId, request);
         if (updatedNote.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Failed to update note!");
         }
         return "redirect:/notes/" + noteId;
     }
 
-    // ========= DELETE OPERATIONS ===========
+    // ===================== DELETE OPERATIONS =====================
 
-    @PostMapping("lists/{listId}/todos/{todoId}/delete")
+    @PostMapping("/lists/{listId}/todos/{todoId}/delete")
     public String deleteTodo(@PathVariable Long listId,
                              @PathVariable Long todoId,
                              RedirectAttributes redirectAttributes) {
@@ -345,7 +345,7 @@ public class WebController {
         return "redirect:/";
     }
 
-    // ========= CONFIRM DELETE PAGE ===========
+    // ===================== CONFIRM DELETE PAGE =====================
     @GetMapping("/lists/{id}/delete-confirm")
     public String confirmDeleteTodoList(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         return todoService.getTodoList(id)
@@ -356,7 +356,7 @@ public class WebController {
                     model.addAttribute("cancelHref", "/");
                     model.addAttribute("formAction", "/lists/" + id + "/delete");
                     model.addAttribute("submitLabel", "Yes, Delete");
-                    return "pages/delete-confirm";
+                    return "/pages/delete-confirm";
                 })
                 .orElseGet(() -> {
                     redirectAttributes.addFlashAttribute("errorMessage", "Todo list not found!");
@@ -382,7 +382,7 @@ public class WebController {
         model.addAttribute("cancelHref", "/lists/" + listId);
         model.addAttribute("formAction", "/lists/" + listId + "/todos/" + todoId + "/delete");
         model.addAttribute("submitLabel", "Yes, Delete");
-        return "pages/delete-confirm";
+        return "/pages/delete-confirm";
     }
 
     @GetMapping("/notes/{id}/delete-confirm")
@@ -395,7 +395,7 @@ public class WebController {
                     model.addAttribute("cancelHref", "/notes/" + id);
                     model.addAttribute("formAction", "/notes/" + id + "/delete");
                     model.addAttribute("submitLabel", "Yes, Delete");
-                    return "pages/delete-confirm";
+                    return "/pages/delete-confirm";
                 })
                 .orElseGet(() -> {
                     redirectAttributes.addFlashAttribute("errorMessage", "Note not found!");
@@ -404,7 +404,7 @@ public class WebController {
     }
 
 
-    // ========= DETAIL VIEWS ===========
+    // ===================== DETAIL VIEWS =====================
 
     // Show specific todo list with todos
     @GetMapping("/lists/{listId}")
@@ -452,7 +452,7 @@ public class WebController {
                 .map(note -> {
                     model.addAttribute("note", note);
                     model.addAttribute("editNoteRequest", new NoteRequest());
-                    return "pages/note-details";
+                    return "/pages/note-details";
                 })
                 .orElseGet(() -> {
                     redirectAttributes.addFlashAttribute("errorMessage", "Note not found!");

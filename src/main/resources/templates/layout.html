@@ -10,7 +10,6 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/style.css}" />
-    <link rel="stylesheet" th:href="@{/css/fab.css}" />
     <link rel="stylesheet" th:href="@{/css/dropdown.css}" />
     <link rel="stylesheet" th:href="@{/css/forms.css}" />
     <link rel="stylesheet" th:href="@{/css/dashboard-card.css}" />
@@ -27,26 +26,6 @@
             </a>
         </div>
     </nav>
-
-
-    <!-- Expandable floating action button Menu -->
-    <div th:fragment="fab" class="fab-menu">
-        <input type="checkbox" id="fab-toggle">
-        <label for="fab-toggle" class="fab-backdrop"></label>
-        <label for="fab-toggle" class="fab-main">
-            <i class="fas fa-plus"></i>
-        </label>
-        <div class="fab-actions">
-            <a href="/lists/new" class="fab-action fab-new-list">
-                <i class="fas fa-list"></i>
-                New List
-            </a>
-            <a href="/notes/new" class="fab-action fab-new-note">
-                <i class="fas fa-sticky-note"></i>
-                New Note
-            </a>
-        </div>
-    </div>
 </body>
 
 </html>

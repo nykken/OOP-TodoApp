@@ -8,11 +8,11 @@
     <div class="main-container">
         <div class="header-section">
             <h1 class="header-title">
-                <a th:href="@{${cancelHref}}" class="btn btn-primary">
+                <a th:href="@{${cancelHref}}" class="btn btn-outline-primary">
                     <i class="fas fa-arrow-left"></i>
                     Back
                 </a>
-                <span th:text="${title}">Delete</span>
+                <span th:text="${title}"></span>
             </h1>
         </div>
 
@@ -27,7 +27,7 @@
                 <span th:if="${entityType.name() == 'NOTE'}">
                     Do you want to delete the note "<strong th:text="${entityName}"></strong>"?
                 </span>
-                <span th:if="${entityType.name() == 'TODO_LIST'}">
+                <span th:if="${entityType.name() == 'TODOLIST'}">
                     Do you want to delete the todo list "<strong th:text="${entityName}"></strong>"?
                 </span>
             </p>
@@ -35,7 +35,7 @@
         </div>
 
         <div class="form-actions" style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
-            <a th:href="@{${cancelHref}}" class="btn btn-secondary">Cancel</a>
+            <a th:href="${cancelHref}" class="btn btn-outline-secondary">Cancel</a>
             <form th:action="@{${formAction}}" method="post" style="display: inline;">
                 <button type="submit" class="btn btn-outline-danger">
                     <i class="fas fa-trash"></i>

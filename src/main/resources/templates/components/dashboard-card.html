@@ -43,14 +43,14 @@
 
                 <!-- Note Preview -->
                 <div th:if="${item.entityType.name() == 'NOTE'}">
-                    <p class="note-preview" th:text="${item.preview}"></p>
+                    <p class="note-preview" th:text="${item.body}"></p>
                 </div>
             </div>
         </div>
 
         <!-- Footer -->
         <div class="card-footer">
-            <span class="footer-timestamp" th:text="${@timeUtil.lastEdited(item.updatedAt)}"></span>
+            <span class="footer-timestamp" th:text="${@timeUtil.getSmartTimeDisplay(item.createdAt, item.updatedAt)}"></span>
             <a th:href="${item.entityType.name() == 'TODOLIST' ? '/lists/' + item.id + '/delete-confirm' : '/notes/' + item.id + '/delete-confirm'}"
                class="btn btn-outline-danger btn-sm">
                 <i class="fas fa-trash"></i>
