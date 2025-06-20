@@ -11,7 +11,4 @@ public interface TodoRepository extends JpaRepository<Todo, Long> {
     List<Todo> findByTodoListId(Long todoListId);
     List<Todo> findByTodoListIdAndCompleted(Long todoListId, Boolean completed);
     Optional<Todo> findByIdAndTodoListId(Long id, Long todoListId);
-
-    long countByTodoListId(Long todoListId);
-    long countByTodoListIdAndCompleted(Long todoListId, Boolean completed);
 }

@@ -14,7 +14,10 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
-
+/**
+ * REST controller for managing todo lists and their associated todo items.
+ * Provides CRUD operations for todo lists and todos at /api/todo-lists.
+ */
 @RestController
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
@@ -23,12 +26,25 @@ public class TodoListController {
 
     private final TodoService todoService;
 
+    // ===================== LIST OPERATIONS =====================
+
+    /**
+     * Retrieve all todo lists.
+     *
+     * @return list of all todo lists
+     */
     @GetMapping
     public ResponseEntity<List<TodoListResponse>> getAllTodoLists() {
         List<TodoListResponse> todoLists = todoService.getAllTodoLists();
         return ResponseEntity.ok(todoLists);
     }
 
+    /**
+     * Retrieve a todo list by ID.
+     *
+     * @param listId the todo list ID
+     * @return the todo list if found, 404 otherwise
+     */
     @GetMapping("/{listId}")
     public ResponseEntity<TodoListResponse> getTodoListById(@PathVariable Long listId) {
         Optional<TodoListResponse> todoList = todoService.getTodoList(listId);
@@ -36,13 +52,25 @@ public class TodoListController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    /**
+     * Create a new todo list.
+     *
+     * @param request the todo list data
+     * @return the created todo list with generated ID
+     */
     @PostMapping
     public ResponseEntity<TodoListResponse> createTodoList(@Valid @RequestBody TodoListRequest request) {
         TodoListResponse createdTodoList = todoService.createTodoList(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTodoList);
     }
 
-    // Rename list
+    /**
+     * Update an existing todo list.
+     *
+     * @param listId the todo list ID
+     * @param request the updated todo list data
+     * @return the updated todo list if found, 404 otherwise
+     */
     @PutMapping("/{listId}")
     public ResponseEntity<TodoListResponse> updateTodoList(
             @PathVariable Long listId,
@@ -53,6 +81,12 @@ public class TodoListController {
     }
 
 
+    /**
+     * Delete a todo list by ID.
+     *
+     * @param listId the todo list ID
+     * @return 204 if deleted, 404 if not found
+     */
     @DeleteMapping("/{listId}")
     public ResponseEntity<Void> deleteTodoList(@PathVariable Long listId) {
         if (todoService.deleteTodoList(listId)) {
@@ -62,8 +96,15 @@ public class TodoListController {
         }
     }
 
-    // ---- TODO OPERATIONS ----
+    // ===================== TODO OPERATIONS =====================
 
+    /**
+     * Retrieve todos from a todo list with optional filtering.
+     *
+     * @param listId the todo list ID
+     * @param completed filter by completion status (true/false/null for all)
+     * @return list of todos
+     */
     @GetMapping("/{listId}/todos")
     public ResponseEntity<List<TodoResponse>> getTodos(
             @PathVariable Long listId,
@@ -78,6 +119,13 @@ public class TodoListController {
         return ResponseEntity.ok(todos);
     }
 
+    /**
+     * Retrieve a todo by ID.
+     *
+     * @param listId the todo list ID
+     * @param todoId the todo ID
+     * @return the todo if found, 404 otherwise
+     */
     @GetMapping("/{listId}/todos/{todoId}")
     public ResponseEntity<TodoResponse> getTodo(
             @PathVariable Long listId,
@@ -88,6 +136,13 @@ public class TodoListController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    /**
+     * Create a new todo in a todo list.
+     *
+     * @param listId the todo list ID
+     * @param request the todo data
+     * @return the created todo if parent list exists, 404 otherwise
+     */
     @PostMapping("/{listId}/todos")
     public ResponseEntity<TodoResponse> createTodo(
             @PathVariable Long listId,
@@ -98,6 +153,14 @@ public class TodoListController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    /**
+     * Update an existing todo.
+     *
+     * @param listId the todo list ID
+     * @param todoId the todo ID
+     * @param request the updated todo data
+     * @return the updated todo if found, 404 otherwise
+     */
     @PutMapping("/{listId}/todos/{todoId}")
     public ResponseEntity<TodoResponse> updateTodo(
             @PathVariable Long listId,
@@ -109,19 +172,32 @@ public class TodoListController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    /**
+     * Delete a todo by ID.
+     *
+     * @param listId the todo list ID
+     * @param todoId the todo ID
+     * @return 204 if deleted, 404 if not found
+     */
     @DeleteMapping("/{listId}/todos/{todoId}")
     public ResponseEntity<Void> deleteTodo(
             @PathVariable Long listId,
             @PathVariable Long todoId) {
 
-        boolean deleted = todoService.deleteTodo(listId, todoId);
-        if (deleted) {
+        if (todoService.deleteTodo(listId, todoId)) {
             return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
+    /**
+     * Mark a todo as complete.
+     *
+     * @param listId the todo list ID
+     * @param todoId the todo ID
+     * @return the updated todo if found, 404 otherwise
+     */
     @PatchMapping("/{listId}/todos/{todoId}/complete")
     public ResponseEntity<TodoResponse> markTodoAsComplete(
             @PathVariable Long listId,
@@ -132,6 +208,13 @@ public class TodoListController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    /**
+     * Mark a todo as incomplete.
+     *
+     * @param listId the todo list ID
+     * @param todoId the todo ID
+     * @return the updated todo if found, 404 otherwise
+     */
     @PatchMapping("/{listId}/todos/{todoId}/incomplete")
     public ResponseEntity<TodoResponse> markTodoAsIncomplete(
             @PathVariable Long listId,

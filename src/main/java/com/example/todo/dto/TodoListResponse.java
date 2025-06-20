@@ -25,10 +25,6 @@ public class TodoListResponse implements DashboardItem {
                 : 0;
     }
 
-    public int getPendingTodos() {
-        return getTotalTodos() - getCompletedTodos();
-    }
-
     public String getProgressString() {
         return getCompletedTodos() + "/" + getTotalTodos();
     }
@@ -42,7 +38,6 @@ public class TodoListResponse implements DashboardItem {
     }
 
     public String getTitle() {
-
         return name;
     }
 

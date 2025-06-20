@@ -9,7 +9,9 @@ import com.example.todo.entities.Note;
 
 import java.util.List;
 
-
+/**
+ * Utility class for converting entities to response DTOs.
+ */
 public class ConversionUtils {
 
     static TodoListResponse convertListToResponse(TodoList todoList) {

@@ -17,6 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Web controller for the todo application UI.
+ * Handles web pages, forms, and user interactions.
+ */
 @Controller
 @RequestMapping("/")
 @RequiredArgsConstructor
@@ -27,6 +31,12 @@ public class WebController {
 
     // ===================== HOME =====================
 
+    /**
+     * Display the home page with all todo lists and notes.
+     *
+     * @param model the view model
+     * @return home page template
+     */
     @GetMapping
     public String home(Model model) {
         List<TodoListResponse> todoLists = todoService.getAllTodoLists();
@@ -48,6 +58,12 @@ public class WebController {
 
     // =====================CREATE/EDIT PAGE =====================
 
+    /**
+     * Show create new todo list form.
+     *
+     * @param model the view model
+     * @return create page template
+     */
     @GetMapping("/lists/new")
     public String newTodoList(Model model) {
         model.addAttribute("entityType", EntityType.TODOLIST);
@@ -59,6 +75,13 @@ public class WebController {
         return "/pages/create";
     }
 
+    /**
+     * Show create new todo form.
+     *
+     * @param model the view model
+     * @param listId the parent todo list ID
+     * @return create page template
+     */
     @GetMapping("/lists/{listId}/todos/new")
     public String newTodo(Model model, @PathVariable Long listId) {
         model.addAttribute("entityType", EntityType.TODO);
@@ -70,6 +93,12 @@ public class WebController {
         return "/pages/create";
     }
 
+    /**
+     * Show create new note form.
+     *
+     * @param model the view model
+     * @return create page template
+     */
     @GetMapping("/notes/new")
     public String newNote(Model model) {
         model.addAttribute("entityType", EntityType.NOTE);
@@ -81,6 +110,14 @@ public class WebController {
         return "/pages/create";
     }
 
+    /**
+     * Show edit todo list form.
+     *
+     * @param id the todo list ID
+     * @param model the view model
+     * @param redirectAttributes redirect attributes for error messages
+     * @return create page template or redirect if not found
+     */
     @GetMapping("/lists/{id}/edit")
     public String editTodoList(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         Optional<TodoListResponse> existingListOpt = todoService.getTodoList(id);
@@ -103,6 +140,15 @@ public class WebController {
         return "/pages/create";
     }
 
+    /**
+     * Show edit todo form.
+     *
+     * @param listId the todo list ID
+     * @param todoId the todo ID
+     * @param model the view model
+     * @param redirectAttributes redirect attributes for error messages
+     * @return create page template or redirect if not found
+     */
     @GetMapping("/lists/{listId}/todos/{todoId}/edit")
     public String editTodo(@PathVariable Long listId,
                                @PathVariable Long todoId,
@@ -129,6 +175,14 @@ public class WebController {
         return "/pages/create";
     }
 
+    /**
+     * Show edit note form.
+     *
+     * @param id the note ID
+     * @param model the view model
+     * @param redirectAttributes redirect attributes for error messages
+     * @return create page template or redirect if not found
+     */
     @GetMapping("/notes/{id}/edit")
     public String editNote(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         Optional<NoteResponse> existingNoteOpt = noteService.getNote(id);
@@ -154,6 +208,15 @@ public class WebController {
 
     // ===================== CREATE OPERATIONS =====================
 
+    /**
+     * Create a new todo list.
+     *
+     * @param request the todo list data
+     * @param bindingResult validation results
+     * @param redirectAttributes redirect attributes for error messages
+     * @param model the view model
+     * @return redirect to new list or home page with errors
+     */
     @PostMapping("/lists")
     public String createTodoList(@Valid @ModelAttribute("newTodoList") TodoListRequest request,
                                  BindingResult bindingResult,
@@ -169,6 +232,16 @@ public class WebController {
         return "redirect:lists/" + createdList.getId();
     }
 
+    /**
+     * Create a new todo in a list.
+     *
+     * @param listId the parent todo list ID
+     * @param request the todo data
+     * @param bindingResult validation results
+     * @param redirectAttributes redirect attributes for error messages
+     * @param model the view model
+     * @return redirect to list details or list page with errors
+     */
     @PostMapping("/lists/{listId}/todos")
     public String createTodo(@PathVariable Long listId,
                              @Valid @ModelAttribute("newTodo") TodoRequest request,
@@ -198,6 +271,15 @@ public class WebController {
         return "redirect:/lists/" + listId;
     }
 
+    /**
+     * Create a new note.
+     *
+     * @param request the note data
+     * @param bindingResult validation results
+     * @param redirectAttributes redirect attributes for error messages
+     * @param model the view model
+     * @return redirect to new note or home page with errors
+     */
     @PostMapping("/notes")
     public String createNote(@Valid @ModelAttribute("newNote") NoteRequest request,
                              BindingResult bindingResult,
@@ -218,7 +300,16 @@ public class WebController {
 
     // ===================== UPDATE OPERATIONS =====================
 
-    // Rename todo list
+    /**
+     * Rename a todo list.
+     *
+     * @param listId the todo list ID
+     * @param request the updated todo list data
+     * @param bindingResult validation results
+     * @param redirectAttributes redirect attributes for error messages
+     * @param model the view model
+     * @return redirect to list details or create page with errors
+     */
     @PostMapping("/lists/{listId}/update")
     public String updateTodoList(@PathVariable Long listId,
                                  @Valid @ModelAttribute("editTodoListRequest") TodoListRequest request,
@@ -244,7 +335,15 @@ public class WebController {
         return "redirect:/lists/" + listId;
     }
 
-    // Edit todo description
+    /**
+     * Update a todo description.
+     *
+     * @param listId the todo list ID
+     * @param todoId the todo ID
+     * @param description the new description
+     * @param redirectAttributes redirect attributes for error messages
+     * @return redirect to list details
+     */
     @PostMapping("/lists/{listId}/todos/{todoId}/update")
     public String updateTodo(@PathVariable Long listId,
                              @PathVariable Long todoId,
@@ -266,7 +365,14 @@ public class WebController {
         return "redirect:/lists/" + listId;
     }
 
-    // Toggle todo completion status
+    /**
+     * Toggle todo completion status.
+     *
+     * @param listId the todo list ID
+     * @param todoId the todo ID
+     * @param redirectAttributes redirect attributes for error messages
+     * @return redirect to list details
+     */
     @PostMapping("/lists/{listId}/todos/{todoId}/toggle")
     public String toggleTodoCompletion(@PathVariable Long listId,
                                        @PathVariable Long todoId,
@@ -289,6 +395,16 @@ public class WebController {
                 });
     }
 
+    /**
+     * Update a note.
+     *
+     * @param noteId the note ID
+     * @param request the updated note data
+     * @param bindingResult validation results
+     * @param redirectAttributes redirect attributes for error messages
+     * @param model the view model
+     * @return redirect to note details or create page with errors
+     */
     @PostMapping("/notes/{noteId}/update")
     public String updateNote(@PathVariable Long noteId,
                              @Valid @ModelAttribute("editNoteRequest") NoteRequest request,
@@ -316,6 +432,14 @@ public class WebController {
 
     // ===================== DELETE OPERATIONS =====================
 
+    /**
+     * Delete a todo.
+     *
+     * @param listId the todo list ID
+     * @param todoId the todo ID
+     * @param redirectAttributes redirect attributes for error messages
+     * @return redirect to list details
+     */
     @PostMapping("/lists/{listId}/todos/{todoId}/delete")
     public String deleteTodo(@PathVariable Long listId,
                              @PathVariable Long todoId,
@@ -327,6 +451,13 @@ public class WebController {
         return "redirect:/lists/" + listId;
     }
 
+    /**
+     * Delete a todo list.
+     *
+     * @param listId the todo list ID
+     * @param redirectAttributes redirect attributes for error messages
+     * @return redirect to home page
+     */
     @PostMapping("/lists/{listId}/delete")
     public String deleteTodoList(@PathVariable Long listId,
                                  RedirectAttributes redirectAttributes) {
@@ -336,6 +467,13 @@ public class WebController {
         return "redirect:/";
     }
 
+    /**
+     * Delete a note.
+     *
+     * @param noteId the note ID
+     * @param redirectAttributes redirect attributes for error messages
+     * @return redirect to home page
+     */
     @PostMapping("/notes/{noteId}/delete")
     public String deleteNote(@PathVariable Long noteId,
                              RedirectAttributes redirectAttributes) {
@@ -346,6 +484,15 @@ public class WebController {
     }
 
     // ===================== CONFIRM DELETE PAGE =====================
+
+    /**
+     * Show delete confirmation page for a todo list.
+     *
+     * @param id the todo list ID
+     * @param model the view model
+     * @param redirectAttributes redirect attributes for error messages
+     * @return delete confirmation page or redirect if not found
+     */
     @GetMapping("/lists/{id}/delete-confirm")
     public String confirmDeleteTodoList(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         return todoService.getTodoList(id)
@@ -364,6 +511,15 @@ public class WebController {
                 });
     }
 
+    /**
+     * Show delete confirmation page for a todo.
+     *
+     * @param listId the todo list ID
+     * @param todoId the todo ID
+     * @param model the view model
+     * @param redirectAttributes redirect attributes for error messages
+     * @return delete confirmation page or redirect if not found
+     */
     @GetMapping("/lists/{listId}/todos/{todoId}/delete-confirm")
     public String confirmDeleteTodo(@PathVariable Long listId, @PathVariable Long todoId,
                                     Model model, RedirectAttributes redirectAttributes) {
@@ -385,6 +541,14 @@ public class WebController {
         return "/pages/delete-confirm";
     }
 
+    /**
+     * Show delete confirmation page for a note.
+     *
+     * @param id the note ID
+     * @param model the view model
+     * @param redirectAttributes redirect attributes for error messages
+     * @return delete confirmation page or redirect if not found
+     */
     @GetMapping("/notes/{id}/delete-confirm")
     public String confirmDeleteNote(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         return noteService.getNote(id)
@@ -406,7 +570,15 @@ public class WebController {
 
     // ===================== DETAIL VIEWS =====================
 
-    // Show specific todo list with todos
+    /**
+     * Display todo list details with optional filtering.
+     *
+     * @param listId the todo list ID
+     * @param filter optional filter (completed/pending)
+     * @param model the view model
+     * @param redirectAttributes redirect attributes for error messages
+     * @return list details page or redirect if not found
+     */
     @GetMapping("/lists/{listId}")
     public String viewTodoList(@PathVariable Long listId,
                                @RequestParam(value = "filter", required = false) String filter,
@@ -444,6 +616,14 @@ public class WebController {
                 });
     }
 
+    /**
+     * Display note details.
+     *
+     * @param noteId the note ID
+     * @param model the view model
+     * @param redirectAttributes redirect attributes for error messages
+     * @return note details page or redirect if not found
+     */
     @GetMapping("/notes/{noteId}")
     public String viewNote(@PathVariable Long noteId,
                            Model model,
