@@ -17,8 +17,6 @@ public class Todo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
-
     @Column(nullable = false, length = 200)
     @Size(max = 200, message = "Description cannot exceed 200 characters")
     private String description;
