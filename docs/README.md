@@ -6,6 +6,7 @@ A Spring Boot application for managing todo lists and notes.
 ## Prerequisites
 
 - Java 17 or higher
+- Annotation processing needs to be enabled
 
 ## How to Run
 

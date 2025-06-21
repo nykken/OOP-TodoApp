@@ -16,7 +16,6 @@ import java.util.Optional;
 
 /**
  * REST controller for managing todo lists and their associated todo items.
- * Provides CRUD operations for todo lists and todos at /api/todo-lists.
  */
 @RestController
 @RequiredArgsConstructor

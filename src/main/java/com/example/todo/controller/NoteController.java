@@ -16,7 +16,6 @@ import java.util.Optional;
 
 /**
  * REST controller for managing notes.
- * Provides CRUD operations for notes at /api/notes.
  */
 @RestController
 @RequiredArgsConstructor

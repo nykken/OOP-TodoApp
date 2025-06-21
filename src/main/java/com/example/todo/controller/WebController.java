@@ -29,6 +29,11 @@ public class WebController {
     private final TodoService todoService;
     private final NoteService noteService;
 
+    @ModelAttribute
+    public void addAttributes(Model model) {
+        model.addAttribute("apiHref", "/swagger-ui.html");
+    }
+
     // ===================== HOME =====================
 
     /**
@@ -48,13 +53,11 @@ public class WebController {
 
         dashboardItems.sort((a, b) -> b.getUpdatedAt().compareTo(a.getUpdatedAt()));
 
-
         model.addAttribute("dashboardItems", dashboardItems);
         model.addAttribute("newTodoList", new TodoListRequest());
         model.addAttribute("newNote", new NoteRequest());
         return "/pages/home";
     }
-
 
     // =====================CREATE/EDIT PAGE =====================
 
@@ -123,8 +126,7 @@ public class WebController {
         Optional<TodoListResponse> existingListOpt = todoService.getTodoList(id);
 
         if (existingListOpt.isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Todo list not found!");
-            return "redirect:/";
+            return redirectWithError(redirectAttributes, "Todo list not found!", "/");
         }
 
         TodoListResponse existingList = existingListOpt.get();
@@ -151,15 +153,14 @@ public class WebController {
      */
     @GetMapping("/lists/{listId}/todos/{todoId}/edit")
     public String editTodo(@PathVariable Long listId,
-                               @PathVariable Long todoId,
-                               Model model,
-                               RedirectAttributes redirectAttributes) {
+                           @PathVariable Long todoId,
+                           Model model,
+                           RedirectAttributes redirectAttributes) {
         Optional<TodoResponse> todoOpt = todoService.getTodo(listId, todoId);
         Optional<TodoListResponse> todoListOpt = todoService.getTodoList(listId);
 
         if (todoOpt.isEmpty() || todoListOpt.isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Todo or list not found!");
-            return "redirect:/lists/" + listId;
+            return redirectWithError(redirectAttributes, "Todo or list not found!", "/lists/" + listId);
         }
 
         TodoResponse todo = todoOpt.get();
@@ -188,8 +189,7 @@ public class WebController {
         Optional<NoteResponse> existingNoteOpt = noteService.getNote(id);
 
         if (existingNoteOpt.isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Note not found!");
-            return "redirect:/";
+            return redirectWithError(redirectAttributes, "Note not found!", "/");
         }
 
         NoteResponse existingNote = existingNoteOpt.get();
@@ -257,10 +257,7 @@ public class WebController {
                         model.addAttribute("editTodoListRequest", new TodoListRequest());
                         return "/pages/list-details";
                     })
-                    .orElseGet(() -> {
-                        redirectAttributes.addFlashAttribute("errorMessage", "Todo list not found!");
-                        return "redirect:/";
-                    });
+                    .orElseGet(() -> redirectWithError(redirectAttributes, "Todo list not found!", "/"));
         }
 
         Optional<TodoResponse> createdTodo = todoService.createTodo(listId, request);
@@ -291,6 +288,7 @@ public class WebController {
             model.addAttribute("todoLists", todoLists);
             model.addAttribute("notes", notes);
             model.addAttribute("newTodoList", new TodoListRequest());
+
             return "/pages/home";
         }
 
@@ -319,8 +317,7 @@ public class WebController {
         if (bindingResult.hasErrors()) {
             Optional<TodoListResponse> todoListOpt = todoService.getTodoList(listId);
             if (todoListOpt.isEmpty()) {
-                redirectAttributes.addFlashAttribute("errorMessage", "Todo list not found!");
-                return "redirect:/";
+                return redirectWithError(redirectAttributes, "Todo list not found!", "/");
             }
 
             model.addAttribute("todoList", todoListOpt.get());
@@ -351,8 +348,7 @@ public class WebController {
                              RedirectAttributes redirectAttributes) {
 
         if (description == null || description.trim().isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Description cannot be empty!");
-            return "redirect:/lists/" + listId;
+            return redirectWithError(redirectAttributes, "Description cannot be empty!", "/lists/" + listId);
         }
 
         TodoRequest request = new TodoRequest();
@@ -389,10 +385,7 @@ public class WebController {
                     }
                     return "redirect:/lists/" + listId;
                 })
-                .orElseGet(() -> {
-                    redirectAttributes.addFlashAttribute("errorMessage", "Todo not found!");
-                    return "redirect:/lists/" + listId;
-                });
+                .orElseGet(() -> redirectWithError(redirectAttributes, "Todo not found!", "/lists/" + listId));
     }
 
     /**
@@ -417,10 +410,7 @@ public class WebController {
                         model.addAttribute("note", note);
                         return "/pages/create";
                     })
-                    .orElseGet(() -> {
-                        redirectAttributes.addFlashAttribute("errorMessage", "Note not found!");
-                        return "redirect:/";
-                    });
+                    .orElseGet(() -> redirectWithError(redirectAttributes, "Note not found!", "/"));
         }
 
         Optional<NoteResponse> updatedNote = noteService.updateNote(noteId, request);
@@ -505,10 +495,7 @@ public class WebController {
                     model.addAttribute("submitLabel", "Yes, Delete");
                     return "/pages/delete-confirm";
                 })
-                .orElseGet(() -> {
-                    redirectAttributes.addFlashAttribute("errorMessage", "Todo list not found!");
-                    return "redirect:/";
-                });
+                .orElseGet(() -> redirectWithError(redirectAttributes, "Todo list not found!", "/"));
     }
 
     /**
@@ -527,8 +514,7 @@ public class WebController {
         Optional<TodoResponse> todoOpt = todoService.getTodo(listId, todoId);
 
         if (todoListOpt.isEmpty() || todoOpt.isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Todo or list not found!");
-            return "redirect:/lists/" + listId;
+            return redirectWithError(redirectAttributes, "Todo or list not found!", "/lists/" + listId);
         }
 
         model.addAttribute("entityType", EntityType.TODO);
@@ -561,12 +547,8 @@ public class WebController {
                     model.addAttribute("submitLabel", "Yes, Delete");
                     return "/pages/delete-confirm";
                 })
-                .orElseGet(() -> {
-                    redirectAttributes.addFlashAttribute("errorMessage", "Note not found!");
-                    return "redirect:/notes";
-                });
+                .orElseGet(() -> redirectWithError(redirectAttributes, "Note not found!", "/notes"));
     }
-
 
     // ===================== DETAIL VIEWS =====================
 
@@ -610,10 +592,7 @@ public class WebController {
 
                     return "/pages/list-details";
                 })
-                .orElseGet(() -> {
-                    redirectAttributes.addFlashAttribute("errorMessage", "Todo list not found!");
-                    return "redirect:/";
-                });
+                .orElseGet(() -> redirectWithError(redirectAttributes, "Todo list not found!", "/"));
     }
 
     /**
@@ -634,9 +613,16 @@ public class WebController {
                     model.addAttribute("editNoteRequest", new NoteRequest());
                     return "/pages/note-details";
                 })
-                .orElseGet(() -> {
-                    redirectAttributes.addFlashAttribute("errorMessage", "Note not found!");
-                    return "redirect:/";
-                });
+                .orElseGet(() -> redirectWithError(redirectAttributes, "Note not found!", "/"));
+    }
+
+    // ===================== HELPER METHOD =====================
+
+    /**
+     * Redirect with error message
+     */
+    private String redirectWithError(RedirectAttributes redirectAttributes, String errorMessage, String redirectUrl) {
+        redirectAttributes.addFlashAttribute("errorMessage", errorMessage);
+        return "redirect:" + redirectUrl;
     }
 }
