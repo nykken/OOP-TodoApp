@@ -1,0 +1,263 @@
+classDiagram
+%% Controllers
+    class TodoListController {
+        -TodoService todoService
+        +getAllTodoLists(): ResponseEntity~List~TodoListResponse~~
+        +getTodoListById(Long): ResponseEntity~TodoListResponse~
+        +createTodoList(TodoListRequest): ResponseEntity~TodoListResponse~
+        +updateTodoList(Long, TodoListRequest): ResponseEntity~TodoListResponse~
+        +deleteTodoList(Long): ResponseEntity~Void~
+        +getTodos(Long, Boolean): ResponseEntity~List~TodoResponse~~
+        +getTodo(Long, Long): ResponseEntity~TodoResponse~
+        +createTodo(Long, TodoRequest): ResponseEntity~TodoResponse~
+        +updateTodo(Long, Long, TodoRequest): ResponseEntity~TodoResponse~
+        +deleteTodo(Long, Long): ResponseEntity~Void~
+        +markTodoAsComplete(Long, Long): ResponseEntity~TodoResponse~
+        +markTodoAsIncomplete(Long, Long): ResponseEntity~TodoResponse~
+    }
+
+    class NoteController {
+        -NoteService noteService
+        +getAllNotes(): ResponseEntity~List~NoteResponse~~
+        +getNoteById(Long): ResponseEntity~NoteResponse~
+        +createNote(NoteRequest): ResponseEntity~NoteResponse~
+        +updateNote(Long, NoteRequest): ResponseEntity~NoteResponse~
+        +deleteNote(Long): ResponseEntity~Void~
+    }
+
+    class WebController {
+        -TodoService todoService
+        -NoteService noteService
+        +home(Model): String
+        +newTodoList(Model): String
+        +newTodo(Model, Long): String
+        +newNote(Model): String
+        +editTodoList(Long, Model, RedirectAttributes): String
+        +editTodo(Long, Long, Model, RedirectAttributes): String
+        +editNote(Long, Model, RedirectAttributes): String
+        +createTodoList(TodoListRequest, BindingResult, RedirectAttributes, Model): String
+        +createTodo(Long, TodoRequest, BindingResult, RedirectAttributes, Model): String
+        +createNote(NoteRequest, BindingResult, RedirectAttributes, Model): String
+        +updateTodoList(Long, TodoListRequest, BindingResult, RedirectAttributes, Model): String
+        +updateTodo(Long, Long, String, RedirectAttributes): String
+        +updateNote(Long, NoteRequest, BindingResult, RedirectAttributes, Model): String
+        +deleteTodo(Long, Long, RedirectAttributes): String
+        +deleteTodoList(Long, RedirectAttributes): String
+        +deleteNote(Long, RedirectAttributes): String
+        +confirmDeleteTodoList(Long, Model, RedirectAttributes): String
+        +confirmDeleteTodo(Long, Long, Model, RedirectAttributes): String
+        +confirmDeleteNote(Long, Model, RedirectAttributes): String
+        +viewTodoList(Long, String, Model, RedirectAttributes): String
+        +viewNote(Long, Model, RedirectAttributes): String
+        +toggleTodoCompletion(Long, Long, RedirectAttributes): String
+    }
+
+%% Services
+    class TodoService {
+        -TodoRepository todoRepository
+        -TodoListRepository todoListRepository
+        +getTodoList(Long): Optional~TodoListResponse~
+        +getAllTodoLists(): List~TodoListResponse~
+        +createTodoList(TodoListRequest): TodoListResponse
+        +updateTodoList(Long, TodoListRequest): Optional~TodoListResponse~
+        +deleteTodoList(Long): boolean
+        +getTodos(Long): List~TodoResponse~
+        +getTodos(Long, Boolean): List~TodoResponse~
+        +getTodo(Long, Long): Optional~TodoResponse~
+        +createTodo(Long, TodoRequest): Optional~TodoResponse~
+        +updateTodo(Long, Long, TodoRequest): Optional~TodoResponse~
+        +deleteTodo(Long, Long): boolean
+        +markTodoAsComplete(Long, Long): Optional~TodoResponse~
+        +markTodoAsIncomplete(Long, Long): Optional~TodoResponse~
+        -setTodoCompletionStatus(Long, Long, boolean): Optional~TodoResponse~
+    }
+
+    class NoteService {
+        -NoteRepository noteRepository
+        +getNote(Long): Optional~NoteResponse~
+        +getAllNotes(): List~NoteResponse~
+        +createNote(NoteRequest): NoteResponse
+        +updateNote(Long, NoteRequest): Optional~NoteResponse~
+        +deleteNote(Long): boolean
+    }
+
+    class ConversionUtils {
+        +convertListToResponse(TodoList): TodoListResponse
+        +convertTodoToResponse(Todo): TodoResponse
+        +convertNoteToResponse(Note): NoteResponse
+    }
+
+%% Entities
+    class TodoList {
+        -Long id
+        -String name
+        -List~Todo~ todos
+        -LocalDateTime createdAt
+        -LocalDateTime updatedAt
+        +TodoList(String)
+    }
+
+    class Todo {
+        -Long id
+        -String description
+        -Boolean completed
+        -TodoList todoList
+        +Todo(String, TodoList)
+        -prePersistUpdateRemove()
+    }
+
+    class Note {
+        -Long id
+        -String title
+        -String body
+        -LocalDateTime createdAt
+        -LocalDateTime updatedAt
+        +Note(String, String)
+    }
+
+%% DTOs
+    class TodoListRequest {
+        -String name
+    }
+
+    class TodoListResponse {
+        -Long id
+        -String name
+        -List~TodoResponse~ todos
+        -LocalDateTime createdAt
+        -LocalDateTime updatedAt
+        +getTotalTodos(): int
+        +getCompletedTodos(): int
+        +getProgressString(): String
+        +getCompletionPercentage(): int
+        +getTitle(): String
+        +getEntityType(): EntityType
+    }
+
+    class TodoRequest {
+        -String description
+    }
+
+    class TodoResponse {
+        -Long id
+        -String description
+        -boolean completed
+    }
+
+    class NoteRequest {
+        -String title
+        -String body
+    }
+
+    class NoteResponse {
+        -Long id
+        -String title
+        -String body
+        -LocalDateTime createdAt
+        -LocalDateTime updatedAt
+        +getProgressString(): String
+        +getEntityType(): EntityType
+    }
+
+%% Interfaces
+    class DashboardItem {
+        <<interface>>
+        +getUpdatedAt(): LocalDateTime
+        +getId(): Long
+        +getProgressString(): String
+        +getTitle(): String
+        +getEntityType(): EntityType
+        +getCompletionPercentage(): int
+    }
+
+%% Repositories
+    class TodoListRepository {
+        <<interface>>
+        +findById(Long): Optional~TodoList~
+        +findAll(): List~TodoList~
+        +save(TodoList): TodoList
+        +delete(TodoList): void
+        +deleteById(Long): void
+    }
+
+    class TodoRepository {
+        <<interface>>
+        +findByTodoListId(Long): List~Todo~
+        +findByTodoListIdAndCompleted(Long, Boolean): List~Todo~
+        +findByIdAndTodoListId(Long, Long): Optional~Todo~
+        +save(Todo): Todo
+        +deleteById(Long): void
+    }
+
+    class NoteRepository {
+        <<interface>>
+        +findById(Long): Optional~Note~
+        +findAll(): List~Note~
+        +save(Note): Note
+        +deleteById(Long): void
+        +existsById(Long): boolean
+    }
+
+%% Utilities
+    class EntityType {
+        <<enumeration>>
+        TODOLIST
+        TODO
+        NOTE
+    }
+
+    class TimeUtil {
+        +getRelativeTime(LocalDateTime): String
+        +lastEdited(LocalDateTime): String
+        +created(LocalDateTime): String
+        +since(LocalDateTime): String
+        +getSmartTimeDisplay(LocalDateTime, LocalDateTime): String
+    }
+
+    class TodoApplication {
+        +main(String[]): void
+    }
+
+%% Relationships
+    TodoListController --> TodoService
+    NoteController --> NoteService
+    WebController --> TodoService
+    WebController --> NoteService
+
+    TodoService --> TodoListRepository
+    TodoService --> TodoRepository
+    TodoService --> ConversionUtils
+    NoteService --> NoteRepository
+    NoteService --> ConversionUtils
+
+    TodoListRepository --> TodoList
+    TodoRepository --> Todo
+    NoteRepository --> Note
+
+    ConversionUtils --> TodoList
+    ConversionUtils --> Todo
+    ConversionUtils --> Note
+    ConversionUtils --> TodoListResponse
+    ConversionUtils --> TodoResponse
+    ConversionUtils --> NoteResponse
+
+    TodoList *-- "many" Todo : contains
+    Todo "1" --> TodoList : belongs to
+
+    TodoListResponse ..|> DashboardItem : implements
+    NoteResponse ..|> DashboardItem : implements
+
+    TodoListResponse --> EntityType
+    NoteResponse --> EntityType
+
+    TodoService --> TodoListRequest
+    TodoService --> TodoListResponse
+    TodoService --> TodoRequest
+    TodoService --> TodoResponse
+    NoteService --> NoteRequest
+    NoteService --> NoteResponse
+
+%% Spring Boot Framework Dependencies
+    TodoListRepository --|> JpaRepository : extends
+    TodoRepository --|> JpaRepository : extends
+    NoteRepository --|> JpaRepository : extends

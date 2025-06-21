@@ -5,7 +5,10 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
-@Component("timeUtil")  // Named bean for Thymeleaf access
+/**
+ * Static utility for converting timestamps to human-readable relative time strings in templates.
+ */
+@Component("timeUtil")
 public class TimeUtil {
 
     public String getRelativeTime(LocalDateTime dateTime) {
@@ -66,11 +69,7 @@ public class TimeUtil {
         return relativeTime.isEmpty() ? "" : "Created " + relativeTime;
     }
 
-    public String since(LocalDateTime dateTime) {
-        return getRelativeTime(dateTime);
-    }
 
-    // Smart methods that handle the "created vs updated" logic
     public String getSmartTimeDisplay(LocalDateTime createdAt, LocalDateTime updatedAt) {
         if (updatedAt == null && createdAt == null) {
             return "";

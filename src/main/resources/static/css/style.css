@@ -1,7 +1,7 @@
 * {
-margin: 0;
-padding: 0;
-box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 .name-and-edit-icon {
@@ -11,10 +11,10 @@ box-sizing: border-box;
 }
 
 .edit-btn {
-    color: #6366f1; /* Blue color */
+    color: #6366f1;
     text-decoration: none;
     padding: 0.5rem;
-    border-radius: 50%; /* Makes it round */
+    border-radius: 50%;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -24,9 +24,9 @@ box-sizing: border-box;
 }
 
 .edit-btn:hover {
-    background-color: rgba(99, 102, 241, 0.1); /* Transparent blue background */
-    color: #5855eb; /* Slightly darker blue on hover */
-    transform: scale(1.1); /* Optional: slight grow effect */
+    background-color: rgba(99, 102, 241, 0.1);
+    color: #5855eb;
+    transform: scale(1.1);
 }
 
 .edit-btn i {
@@ -34,78 +34,78 @@ box-sizing: border-box;
 }
 
 body {
-background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-min-height: 100vh;
-font-family: 'Inter', sans-serif;
-color: #1e293b;
-line-height: 1.6;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    color: #1e293b;
+    line-height: 1.6;
 }
 
 /* Container System */
-.container {
-max-width: 1000px;
-margin: 0 auto;
-padding: 0 1rem;
+    .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 1rem;
 }
 
 /* Navigation */
 .navbar {
-background: rgba(255, 255, 255, 0.95);
-backdrop-filter: blur(10px);
-border-bottom: 1px solid #e2e8f0;
-position: sticky;
-top: 0;
-z-index: 100;
-padding: 1rem 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #e2e8f0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 1rem 0;
 }
 
 .navbar .container {
-display: flex;
-justify-content: space-between;
-align-items: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .navbar-brand {
-font-weight: 700;
-font-size: 1.5rem;
-color: #6366f1;
-text-decoration: none;
-display: flex;
-align-items: center;
-gap: 0.5rem;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #6366f1;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .navbar-brand:hover {
-color: #5855eb;
+    color: #5855eb;
 }
 
-/* Main Container */
-.main-container {
-background-color: white;
-border-radius: 16px;
-box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-margin: 2rem auto;
-padding: 2rem;
+
+    .main-container {
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    margin: 2rem auto;
+    padding: 2rem;
 }
 
-/* Header Section */
+
 .header-section {
-flex-direction: row;
-gap: 1rem;
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 2rem;
+    flex-direction: row;
+    gap: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
 }
 
 .header-title {
-font-size: 1.875rem;
-font-weight: 600;
-color: #1e293b;
-display: flex;
-justify-content: space-between;
-align-items: center;
-gap: 0.75rem;
+    font-size: 1.875rem;
+    font-weight: 600;
+    color: #1e293b;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
 }
 
 .form-actions .btn {
@@ -128,93 +128,93 @@ gap: 0.75rem;
 }
 
 .btn-primary {
-background: #6366f1;
-color: white;
+    background: #6366f1;
+    color: white;
 }
 
 .btn-primary:hover {
-background: #5855eb;
-transform: translateY(-1px);
-box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    background: #5855eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
 
 .btn-outline-primary {
-background: transparent;
-color: #6366f1;
-border: 1px solid #6366f1;
+    background: transparent;
+    color: #6366f1;
+    border: 1px solid #6366f1;
 }
 
 .btn-outline-primary:hover {
-background: #6366f1;
-color: white;
+    background: #6366f1;
+    color: white;
 }
 
 .btn-outline-danger {
-background: transparent;
-color: #ef4444;
-border: 1px solid #ef4444;
+    background: transparent;
+    color: #ef4444;
+    border: 1px solid #ef4444;
 }
 
 .btn-outline-danger:hover {
-background: #ef4444;
-color: white;
+    background: #ef4444;
+    color: white;
 }
 
 .btn-outline-secondary {
-background: transparent;
-color: #6b7280;
-border: 1px solid #6b7280;
+    background: transparent;
+    color: #6b7280;
+    border: 1px solid #6b7280;
 }
 
 .btn-outline-secondary:hover,
 .btn-outline-secondary.active {
-background: #6b7280;
-color: white;
+    background: #6b7280;
+    color: white;
 }
 
 .btn-outline-warning {
-background: transparent;
-color: #f59e0b;
-border: 1px solid #f59e0b;
+    background: transparent;
+    color: #f59e0b;
+    border: 1px solid #f59e0b;
 }
 
 .btn-outline-warning:hover,
 .btn-outline-warning.active {
-background: #f59e0b;
-color: white;
+    background: #f59e0b;
+    color: white;
 }
 
 .btn-outline-success {
-background: transparent;
-color: #10b981;
-border: 1px solid #10b981;
+    background: transparent;
+    color: #10b981;
+    border: 1px solid #10b981;
 }
 
 .btn-outline-success:hover,
 .btn-outline-success.active {
-background: #10b981;
-color: white;
+    background: #10b981;
+    color: white;
 }
 
 .btn-sm {
-padding: 0.5rem 1rem;
-font-size: 0.75rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
 }
 
 .btn-secondary {
-background: #6b7280;
-color: white;
+    background: #6b7280;
+    color: white;
 }
 
 .btn-secondary:hover {
-background: #4b5563;
+    background: #4b5563;
 }
 
 .btn-link {
-background: none;
-border: none;
-padding: 0;
-color: inherit;
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
 }
 
 .text-success {
@@ -224,39 +224,37 @@ color: inherit;
 
 /* Filter Buttons */
 .filter-section {
-display: flex;
-justify-content: start;
-gap: 0.75rem;
-margin-bottom: 2rem;
-flex-wrap: wrap;
+    display: flex;
+    justify-content: start;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
 }
 
-/* Empty State */
 .empty-state {
-text-align: center;
-padding: 3rem 0;
+    text-align: center;
+    padding: 3rem 0;
 }
 
 .empty-state i {
-font-size: 3rem;
-color: #9ca3af;
-margin-bottom: 1rem;
+    font-size: 3rem;
+    color: #9ca3af;
+    margin-bottom: 1rem;
 }
 
 .empty-state h4 {
-color: #6b7280;
-margin-bottom: 0.5rem;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
 }
 
 .empty-state p {
-color: #9ca3af;
+    color: #9ca3af;
 }
 
-/* Todo List */
 .todo-list {
-display: flex;
-flex-direction: column;
-gap: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
 }
 
 .todo-item {
@@ -272,46 +270,45 @@ gap: 0.75rem;
 }
 
 .todo-item:hover {
-background: #f1f5f9;
-transform: translateY(-1px);
-box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.1);
+    background: #f1f5f9;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.1);
 }
 
 .todo-content {
-display: flex;
-align-items: center;
-gap: 1rem;
-flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
 }
 
 .todo-toggle {
-display: flex;
-align-items: center;
+    display: flex;
+    align-items: center;
 }
 
 .todo-text {
-font-size: 1rem;
-color: #374151;
+    font-size: 1rem;
+    color: #374151;
 
 }
 
 .todo-text.completed {
-text-decoration: line-through;
-opacity: 0.6;
-color: #9ca3af;
+    text-decoration: line-through;
+    opacity: 0.6;
+    color: #9ca3af;
 }
 
 .todo-actions {
-display: flex;
-gap: 0.5rem;
-align-items: center;
-justify-content: center;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
 }
 
 
-/* Text Utilities */
 .text-muted {
-color: #6b7280;
+    color: #6b7280;
 }
 
 
@@ -323,23 +320,23 @@ color: #6b7280;
 
 
 .btn-close {
-background: none;
-border: none;
-font-size: 1.5rem;
-cursor: pointer;
-color: #6b7280;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #6b7280;
 }
 
 .btn-close:hover {
-color: #374151;
+    color: #374151;
 }
 
 
 
 @media (max-width: 768px) {
-.container {
-padding: 0 0.5rem;
-}
+    .container {
+        padding: 0 0.5rem;
+    }
 }
 
 .small-timestamp-text {

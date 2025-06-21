@@ -1,119 +1,118 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
-<head th:insert="~{layout :: head}"></head>
-<body>
-<!-- Navigation -->
-<nav th:insert="~{layout :: nav}"></nav>
+  <head th:insert="~{layout :: head}"></head>
+  <body>
+    <!-- Navigation -->
+    <nav th:insert="~{layout :: nav}"></nav>
 
-<div class="container">
-  <div class="main-container">
+    <div class="container">
+      <div class="main-container">
 
-    <!-- Header Section -->
-    <div class="header-section">
-      <a th:href="@{/}" class="btn btn-outline-primary">
-        <i class="fas fa-arrow-left"></i>
-        Back
-      </a>
-      <div class="name-and-timestamp">
-        <div class="name-and-edit-icon">
-          <h1 class="header-title" th:text="${todoList != null ? todoList.name : 'Todo List'}">
-            Todo List Name
-          </h1>
-          <a th:href="@{/lists/{id}/edit(id=${todoList.id})}" class="edit-btn">
-            <i class="fas fa-edit"></i>
+        <!-- Header Section -->
+        <div class="header-section">
+          <a th:href="@{/}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left"></i>
+            Back
           </a>
-        </div>
-        <div>
-          <small class="small-timestamp-text" th:if="${todoList.updatedAt == todoList.createdAt}">
-            Created: <span th:text="${#temporals.format(todoList.updatedAt, 'MMM dd, yyyy HH:mm')}">Jan 01, 2023 12:00</span>
-          </small>
-          <small class="small-timestamp-text" th:if="${todoList.updatedAt != todoList.createdAt}">
-            Last Updated: <span th:text="${#temporals.format(todoList.updatedAt, 'MMM dd, yyyy HH:mm')}">Jan 01, 2023 12:00</span>
-          </small>
-        </div>
-      </div>
-      <a th:href="@{/lists/{id}/delete-confirm(id=${todoList.id})}" class="btn btn-outline-danger">
-        <i class="fas fa-trash"></i>
-        Delete
-      </a>
-    </div>
-
-    <!-- Filter Buttons -->
-    <div class="list-details-buttons">
-      <div class="filter-section">
-        <a th:href="@{/lists/{id}(id=${todoList.id})}"
-           class="btn btn-outline-secondary btn-sm"
-           th:classappend="${currentFilter == null ? 'active' : ''}">
-          All
-        </a>
-        <a th:href="@{/lists/{id}(id=${todoList.id}, filter='pending')}"
-           class="btn btn-outline-warning btn-sm"
-           th:classappend="${currentFilter == 'pending' ? 'active' : ''}">
-          Pending
-        </a>
-        <a th:href="@{/lists/{id}(id=${todoList.id}, filter='completed')}"
-           class="btn btn-outline-success btn-sm"
-           th:classappend="${currentFilter == 'completed' ? 'active' : ''}">
-          Completed
-        </a>
-      </div>
-      <a th:href="@{/lists/{id}/todos/new(id=${todoList.id})}" class="btn btn-primary">
-        <i class="fas fa-plus"></i>
-        Add Todo
-      </a>
-    </div>
-
-    <!-- No todos message -->
-    <div th:if="${not hasTodos}" class="empty-state">
-      <i class="fas fa-clipboard-list"></i>
-      <h4>No todos yet</h4>
-      <p>Add your first todo to get started!</p>
-    </div>
-
-    <!-- No filtered todos message -->
-    <div th:if="${hasTodos and (todos == null or #lists.isEmpty(todos))}" class="empty-state">
-      <i class="fas fa-clipboard-list"></i>
-      <h4 th:switch="${currentFilter}">
-        <span th:case="'pending'">No pending todos</span>
-        <span th:case="'completed'">No completed todos</span>
-      </h4>
-      <p th:switch="${currentFilter}">
-        <span th:case="'pending'">All your todos are completed! 🎉</span>
-        <span th:case="'completed'">Complete some todos to see them here.</span>
-      </p>
-    </div>
-
-    <!-- Todos List -->
-    <div class="todo-list" th:if="${todos != null and not #lists.isEmpty(todos)}">
-      <div class="todo-item" th:each="todo : ${todos}" th:if="${todo != null}">
-        <div class="todo-content">
-          <form th:action="@{/lists/{listId}/todos/{todoId}/toggle(listId=${todoList.id}, todoId=${todo.id})}"
-                method="post" class="todo-toggle">
-            <button type="submit" class="btn btn-link">
-              <i class="fas fa-check-circle text-success" th:if="${todo.completed}"></i>
-              <i class="far fa-circle text-muted" th:unless="${todo.completed}"></i>
-            </button>
-          </form>
-          <span class="todo-text"
-                th:text="${todo.description}"
-                th:classappend="${todo.completed ? 'completed' : ''}">
-              Todo description
-          </span>
-        </div>
-        <div class="todo-actions">
-          <a th:href="@{/lists/{listId}/todos/{todoId}/edit(listId=${todoList.id}, todoId=${todo.id})}"
-             class="btn btn-sm btn-outline-primary">
-            <i class="fas fa-edit"></i>
-          </a>
-          <a th:href="@{/lists/{listId}/todos/{todoId}/delete-confirm(listId=${todoList.id}, todoId=${todo.id})}"
-             class="btn btn-outline-danger btn-sm">
+          <div class="name-and-timestamp">
+            <div class="name-and-edit-icon">
+              <h1 class="header-title" th:text="${todoList != null ? todoList.name : 'Todo List'}">
+                Todo List Name
+              </h1>
+              <a th:href="@{/lists/{id}/edit(id=${todoList.id})}" class="edit-btn">
+                <i class="fas fa-edit"></i>
+              </a>
+            </div>
+            <div>
+              <small class="small-timestamp-text" th:if="${todoList.updatedAt == todoList.createdAt}">
+                Created: <span th:text="${#temporals.format(todoList.updatedAt, 'MMM dd, yyyy HH:mm')}">Jan 01, 2023 12:00</span>
+              </small>
+              <small class="small-timestamp-text" th:if="${todoList.updatedAt != todoList.createdAt}">
+                Last Updated: <span th:text="${#temporals.format(todoList.updatedAt, 'MMM dd, yyyy HH:mm')}">Jan 01, 2023 12:00</span>
+              </small>
+            </div>
+          </div>
+          <a th:href="@{/lists/{id}/delete-confirm(id=${todoList.id})}" class="btn btn-outline-danger">
             <i class="fas fa-trash"></i>
+            Delete
           </a>
         </div>
-      </div>
 
+        <!-- Filter Buttons -->
+        <div class="list-details-buttons">
+          <div class="filter-section">
+            <a th:href="@{/lists/{id}(id=${todoList.id})}"
+               class="btn btn-outline-secondary btn-sm"
+               th:classappend="${currentFilter == null ? 'active' : ''}">
+              All
+            </a>
+            <a th:href="@{/lists/{id}(id=${todoList.id}, filter='pending')}"
+               class="btn btn-outline-warning btn-sm"
+               th:classappend="${currentFilter == 'pending' ? 'active' : ''}">
+              Pending
+            </a>
+            <a th:href="@{/lists/{id}(id=${todoList.id}, filter='completed')}"
+               class="btn btn-outline-success btn-sm"
+               th:classappend="${currentFilter == 'completed' ? 'active' : ''}">
+              Completed
+            </a>
+          </div>
+          <a th:href="@{/lists/{id}/todos/new(id=${todoList.id})}" class="btn btn-primary">
+            <i class="fas fa-plus"></i>
+            Add Todo
+          </a>
+        </div>
+
+        <!-- No todos message -->
+        <div th:if="${not hasTodos}" class="empty-state">
+          <i class="fas fa-clipboard-list"></i>
+          <h4>No todos yet</h4>
+          <p>Add your first todo to get started!</p>
+        </div>
+
+        <!-- No filtered todos message -->
+        <div th:if="${hasTodos and (todos == null or #lists.isEmpty(todos))}" class="empty-state">
+          <i class="fas fa-clipboard-list"></i>
+          <h4 th:switch="${currentFilter}">
+            <span th:case="'pending'">No pending todos</span>
+            <span th:case="'completed'">No completed todos</span>
+          </h4>
+          <p th:switch="${currentFilter}">
+            <span th:case="'pending'">All your todos are completed! 🎉</span>
+            <span th:case="'completed'">Complete some todos to see them here.</span>
+          </p>
+        </div>
+
+        <!-- Todos List -->
+        <div class="todo-list" th:if="${todos != null and not #lists.isEmpty(todos)}">
+          <div class="todo-item" th:each="todo : ${todos}" th:if="${todo != null}">
+            <div class="todo-content">
+              <form th:action="@{/lists/{listId}/todos/{todoId}/toggle(listId=${todoList.id}, todoId=${todo.id})}"
+                    method="post" class="todo-toggle">
+                <button type="submit" class="btn btn-link">
+                  <i class="fas fa-check-circle text-success" th:if="${todo.completed}"></i>
+                  <i class="far fa-circle text-muted" th:unless="${todo.completed}"></i>
+                </button>
+              </form>
+              <span class="todo-text"
+                    th:text="${todo.description}"
+                    th:classappend="${todo.completed ? 'completed' : ''}">
+                  Todo description
+              </span>
+            </div>
+            <div class="todo-actions">
+              <a th:href="@{/lists/{listId}/todos/{todoId}/edit(listId=${todoList.id}, todoId=${todo.id})}"
+                 class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-edit"></i>
+              </a>
+              <a th:href="@{/lists/{listId}/todos/{todoId}/delete-confirm(listId=${todoList.id}, todoId=${todo.id})}"
+                 class="btn btn-outline-danger btn-sm">
+                <i class="fas fa-trash"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-</body>
+  </body>
 </html>

@@ -1,49 +1,49 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
-<head th:insert="~{layout :: head}"></head>
-<body>
-<nav th:insert="~{layout :: nav}"></nav>
+    <head th:insert="~{layout :: head}"></head>
+    <body>
+        <nav th:insert="~{layout :: nav}"></nav>
 
-<div class="container">
-    <div class="main-container">
-        <div class="header-section">
-            <h1 class="header-title">
-                <a th:href="@{${cancelHref}}" class="btn btn-outline-primary">
-                    <i class="fas fa-arrow-left"></i>
-                    Back
-                </a>
-                <span th:text="${title}"></span>
-            </h1>
-        </div>
+        <div class="container">
+            <div class="main-container">
+                <div class="header-section">
+                    <h1 class="header-title">
+                        <a th:href="@{${cancelHref}}" class="btn btn-outline-primary">
+                            <i class="fas fa-arrow-left"></i>
+                            Back
+                        </a>
+                        <span th:text="${title}"></span>
+                    </h1>
+                </div>
 
-        <div class="empty-state">
-            <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
-            <h4>Are you sure?</h4>
-            <p>
-                <span th:if="${entityType.name() == 'TODO'}">
-                    Do you want to delete the todo "<strong th:text="${entityName}"></strong>"
-                    <span th:if="${parentName != null}">from list "<strong th:text="${parentName}"></strong>"</span>?
-                </span>
-                <span th:if="${entityType.name() == 'NOTE'}">
-                    Do you want to delete the note "<strong th:text="${entityName}"></strong>"?
-                </span>
-                <span th:if="${entityType.name() == 'TODOLIST'}">
-                    Do you want to delete the todo list "<strong th:text="${entityName}"></strong>"?
-                </span>
-            </p>
-            <p class="text-muted">This action cannot be undone.</p>
-        </div>
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
+                    <h4>Are you sure?</h4>
+                    <p>
+                        <span th:if="${entityType.name() == 'TODO'}">
+                            Do you want to delete the todo "<strong th:text="${entityName}"></strong>"
+                            <span th:if="${parentName != null}">from list "<strong th:text="${parentName}"></strong>"</span>?
+                        </span>
+                        <span th:if="${entityType.name() == 'NOTE'}">
+                            Do you want to delete the note "<strong th:text="${entityName}"></strong>"?
+                        </span>
+                        <span th:if="${entityType.name() == 'TODOLIST'}">
+                            Do you want to delete the todo list "<strong th:text="${entityName}"></strong>"?
+                        </span>
+                    </p>
+                    <p class="text-muted">This action cannot be undone.</p>
+                </div>
 
-        <div class="form-actions" style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
-            <a th:href="${cancelHref}" class="btn btn-outline-secondary">Cancel</a>
-            <form th:action="@{${formAction}}" method="post" style="display: inline;">
-                <button type="submit" class="btn btn-outline-danger">
-                    <i class="fas fa-trash"></i>
-                    <span th:text="${submitLabel}">Yes, Delete</span>
-                </button>
-            </form>
+                <div class="form-actions" style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center;">
+                    <a th:href="${cancelHref}" class="btn btn-outline-secondary">Cancel</a>
+                    <form th:action="@{${formAction}}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="fas fa-trash"></i>
+                            <span th:text="${submitLabel}">Yes, Delete</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
-</body>
+    </body>
 </html>

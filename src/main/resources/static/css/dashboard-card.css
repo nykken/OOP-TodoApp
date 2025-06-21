@@ -12,9 +12,8 @@
     flex-direction: column;
     height: 300px;
     flex: 1 1 500px;
-    min-width: 400px;
-    max-width: 800px;
     overflow: hidden;
+    width: 100%;
 }
 
 .card:hover {

@@ -1,31 +1,27 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="layout(title, content)">
-<head th:fragment="head">
-    <title>Todo App</title>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Todo App</title>
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/style.css}" />
-    <link rel="stylesheet" th:href="@{/css/dropdown.css}" />
-    <link rel="stylesheet" th:href="@{/css/forms.css}" />
-    <link rel="stylesheet" th:href="@{/css/dashboard-card.css}" />
-</head>
+    <head th:fragment="head">
+        <title>Todo App</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" th:href="@{/css/style.css}" />
+        <link rel="stylesheet" th:href="@{/css/dropdown.css}" />
+        <link rel="stylesheet" th:href="@{/css/forms.css}" />
+        <link rel="stylesheet" th:href="@{/css/dashboard-card.css}" />
+    </head>
 
-<div th:fragment="container" class="container main-container"></div>
-<body>
-    <!-- Navigation -->
-    <nav th:fragment="nav" class="navbar">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                <i class="fas fa-tasks"></i>
-                TodoMaster
-            </a>
-        </div>
-    </nav>
-</body>
+    <body>
+        <!-- Navigation -->
+        <nav th:fragment="nav" class="navbar">
+            <div class="container">
+                <a class="navbar-brand" href="/">
+                    <i class="fas fa-tasks"></i>
+                    TodoMaster
+                </a>
+            </div>
+        </nav>
+    </body>
 
 </html>

@@ -3,33 +3,28 @@
 <head th:replace="~{layout :: head}">
 
 </head>
-<body>
-<!-- Navigation -->
-<nav th:insert="~{layout :: nav}"></nav>
+    <body>
+        <nav th:insert="~{layout :: nav}"></nav>
 
-<!-- Main Content -->
-<div class="container">
-    <div class="main-container">
-        <!-- Header Section -->
-        <div class="header-section">
-            <div th:replace="~{components/dropdown-button :: dropdown-button}"></div>
-        </div>
-
-        <!-- No Items Message -->
-        <div th:if="${dashboardItems == null or #lists.isEmpty(dashboardItems)}" class="empty-state">
-            <i class="fas fa-inbox"></i>
-            <h4>No content yet</h4>
-            <p>Create your first todo list or note to get started!</p>
-        </div>
-
-        <!-- Dashboard Cards -->
-        <div class="cards-container" th:if="${dashboardItems != null and not #lists.isEmpty(dashboardItems)}">
-            <div class th:each="item : ${dashboardItems}">
-                <div th:replace="~{components/dashboard-card :: dashboard-card(item=${item})}"></div>
+        <div class="container">
+            <div class="main-container">
+                <!-- Header Section -->
+                <div class="header-section">
+                    <div th:replace="~{components/dropdown-button :: dropdown-button}"></div>
+                </div>
+                <!-- No Items Message -->
+                <div th:if="${dashboardItems == null or #lists.isEmpty(dashboardItems)}" class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <h4>No content yet</h4>
+                    <p>Create your first todo list or note to get started!</p>
+                </div>
+                <!-- Dashboard Cards -->
+                <div class="cards-container" th:if="${dashboardItems != null and not #lists.isEmpty(dashboardItems)}">
+                    <div class th:each="item : ${dashboardItems}">
+                        <div th:replace="~{components/dashboard-card :: dashboard-card(item=${item})}"></div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
-
-</body>
+    </body>
 </html>
