@@ -22,5 +22,4 @@ public interface DashboardItem {
     default int getCompletionPercentage() {
         return 0;
     }
-
 }

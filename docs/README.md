@@ -17,6 +17,3 @@ A Spring Boot application for managing todo lists and notes.
 
 - **Application**: http://localhost:8080
 - **API Documentation**: http://localhost:8080/swagger-ui.html
-- **Database Console**: http://localhost:8080/h2-console
-    - Username: `sa`
-    - Password: `password`

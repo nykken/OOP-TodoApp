@@ -18,7 +18,6 @@ public class TimeUtil {
 
         LocalDateTime now = LocalDateTime.now();
 
-        // Calculate differences
         long years = ChronoUnit.YEARS.between(dateTime, now);
         long months = ChronoUnit.MONTHS.between(dateTime, now);
         long days = ChronoUnit.DAYS.between(dateTime, now);
@@ -26,12 +25,10 @@ public class TimeUtil {
         long minutes = ChronoUnit.MINUTES.between(dateTime, now);
         long seconds = ChronoUnit.SECONDS.between(dateTime, now);
 
-        // Handle future dates (shouldn't happen but just in case)
         if (seconds < 0) {
             return "just now";
         }
 
-        // Format based on time difference
         if (years > 0) {
             return years == 1 ? "1 year ago" : years + " years ago";
         } else if (months > 0) {
@@ -58,10 +55,9 @@ public class TimeUtil {
         }
     }
 
-    // Convenience methods for templates
     public String lastEdited(LocalDateTime updatedAt) {
         String relativeTime = getRelativeTime(updatedAt);
-        return relativeTime.isEmpty() ? "" : "Last edited " + relativeTime;
+        return relativeTime.isEmpty() ? "" : "Last updated " + relativeTime;
     }
 
     public String created(LocalDateTime createdAt) {
@@ -89,7 +85,7 @@ public class TimeUtil {
             return created(createdAt);
         }
 
-        // Otherwise show last edited
+        // Else show last edited
         return lastEdited(updatedAt);
     }
 }

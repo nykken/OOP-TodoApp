@@ -368,6 +368,9 @@ body {
     font-size: 1rem;
     color: #333;
     white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
 }
 
 .empty-note {
@@ -392,7 +395,7 @@ body {
     border-left: 4px solid #007bff;
 }
 
-.note-metadata small {
+metadata small {
     display: flex;
     align-items: center;
     gap: 0.5rem;

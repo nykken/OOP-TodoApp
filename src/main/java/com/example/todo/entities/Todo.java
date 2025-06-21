@@ -29,8 +29,8 @@ public class Todo {
     private TodoList todoList;
 
     /**
-     * Updates parent todo list timestamp when todo is modified.
-     * Ensures todo list shows correct "last updated" time.
+     * Update parent todo list timestamp when todo is modified.
+     * Ensure todo list shows correct "last updated" time.
      */
     @PrePersist
     @PreUpdate
